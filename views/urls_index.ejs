@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+ <h1>Shmoo's Tiny App</h1>
+ <ul>
+  <% urls.forEach((url) => { %>
+    <li><%= url.shortURL %> - <%= url.fullURL %></li>
+  <% }); %>
+ </ul>
+ <a href="#">Click here to shorten a new URL.</a>
+</body>
+</html>

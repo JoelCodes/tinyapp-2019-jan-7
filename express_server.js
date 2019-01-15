@@ -4,10 +4,10 @@ const PORT = 8080;
 
 app.set('view engine', 'ejs');
 
-const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com'
-};
+const urlDatabase = [
+  { shortURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca'},
+  { shortURL: '9sm5xK', fullURL: 'http://www.google.com'},
+  ];
 
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase};
