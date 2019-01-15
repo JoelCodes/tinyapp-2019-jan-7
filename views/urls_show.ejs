@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title></title>
 </head>
 <body>
-<p>Beep</p>
+<h1>Shmoo's Tiny App</h1>
+
+<p>Your tinyURL is <b><%= shortURL %></b>.</p>
+
+<p>Its full version is
+  <% longURL.forEach((item) => { %>
+    <% if (item.tinyURL == shortURL) { %>
+    <b><%= item.fullURL %></b>
+  <% } %>
+  <% }) %>
+</p>
+
 </body>
 </html>

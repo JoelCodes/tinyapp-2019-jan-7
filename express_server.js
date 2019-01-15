@@ -5,13 +5,18 @@ const PORT = 8080;
 app.set('view engine', 'ejs');
 
 const urlDatabase = [
-  { shortURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca'},
-  { shortURL: '9sm5xK', fullURL: 'http://www.google.com'},
+  { tinyURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca'},
+  { tinyURL: '9sm5xK', fullURL: 'http://www.google.com'},
   ];
 
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase};
   res.render('urls_index', templateVars);
+});
+
+app.get('/urls/:id', (req, res) => {
+  let templateVars = { shortURL: req.params.id, longURL: urlDatabase };
+  res.render('urls_show', templateVars);
 });
 
 app.get('/', (req, res) => {
@@ -24,11 +29,6 @@ app.get('/urls.json', (req, res) => {
 
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
-});
-
-app.get('/urls/:id', (req, res) => {
-  let templateVars = { shortURL: req.params.id };
-  res.render('urls_show', templateVars);
 });
 
 app.listen(PORT, ()=> {
