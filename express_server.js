@@ -38,7 +38,6 @@ app.get('/urls', (req, res) => {
 
 app.get('/u/:shortURL', (req, res) => {
   const idPath = req.originalUrl;
-  console.log("idP", idPath);
   const idString = idPath.split('').slice(3).join('');
   const goHere = [];
   for (let item of urlDatabase){
@@ -46,7 +45,6 @@ app.get('/u/:shortURL', (req, res) => {
       goHere.push(item.fullURL);
     }
   }
-  console.log("go", goHere);
   if (goHere.length > 0){
     res.redirect(302, goHere.join('')); //302, because this is a temporary redirect
   } else {
@@ -62,8 +60,6 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
-
-
 // POST requests
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id; // the id in the address bar
@@ -76,10 +72,14 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
+  const idPath = req.originalUrl;
+  const idString = idPath.split('').slice(6).join(''); // the id/shortURL
+  const test = req.params.id;
+  console.log(test, "torst");
+  // change the urlDatabase array
   const newFull = req.body.newFull; // the contents of the input field
-  console.log("newFull", newFull);
-  res.send('beep');
-})
+  res.redirect('/urls/:id');
+});
 
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
