@@ -51,7 +51,7 @@ app.post('/urls', (req, res) => {
 
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id; // the id in the address bar
-  console.log(toBeDelIndex);
+  console.log(toBeDel);
   res.send("ok");
 });
 
