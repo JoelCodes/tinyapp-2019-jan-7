@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
-  console.log(idString);
+  console.log("from post urls", idString);
   const inputURL = req.body.longURL;
   urlDatabase.push({tinyURL: idString, fullURL: inputURL});
   const goHere = `http://localhost:8080/u/${idString}`;
@@ -58,7 +58,16 @@ app.get('/u/:shortURL', (req, res) => {
       goHere.push(item.fullURL);
     }
   }
-  res.redirect(302, goHere.join(''));
+  console.log(goHere.length);
+  if (goHere.length > 0){
+    res.redirect(302, goHere.join('')); //302, because this is a temporary redirect
+  } else {
+    res.redirect(404, '/not-found');
+  }
+});
+
+app.get('/not-found', (res, req) => {
+  res.send('Sorry. That shortened URL is not in our database.')
 });
 
 app.listen(PORT, ()=> {
@@ -74,3 +83,10 @@ function generateRandomString() {
   }
   return output.join('');
 }
+
+// edge cases:
+// a non-existent shortURL reveals header information but nothing else; but the status says "found" which... is untrue.
+  // fixed! Now it sends an error message on the browser.
+  // apparently it's not fixed.
+// the urlDatabase is refreshed each time the server is restarted
+// 302, yo! It's a temporary redirect.
