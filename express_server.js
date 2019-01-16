@@ -5,6 +5,9 @@ const PORT = 8080;
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 app.set('view engine', 'ejs');
 
 
@@ -90,6 +93,11 @@ app.post('/urls', (req, res) => {
   urlDatabase.push({tinyURL: idString, fullURL: inputURL});
   const goHere = `http://localhost:8080/u/${idString}`;
   res.redirect(302, goHere);
+});
+
+app.post('/login', (req, res) => {
+  // set a cookie named username to the value submitted in the login form (don't worry about options yet)
+  //redirect to /urls
 });
 
 
