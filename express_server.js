@@ -52,11 +52,9 @@
 function generateRandomString() {
   const everyAlphaNum = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`;
   const output = [];
-  for (let aN in everyAlphaNum){
-    let index = Math.floor(Math.random() * Math.floor(61))
-    if (aN <= 5){
-      output.push(everyAlphaNum[index]);
-    }
+  for (let i = 0; i < 6; i++){
+    let randomIndex = Math.floor(Math.random() * Math.floor(61));
+    output.push(everyAlphaNum[randomIndex]);
   }
   console.log(output.join(''));
 }
