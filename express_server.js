@@ -60,6 +60,11 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/urls/:id', (req, res) => {
+  console.log("worked");
+  res.send('beep');
+})
+
 app.get('/u/:shortURL', (req, res) => {
   const idPath = req.originalUrl;
   const idString = idPath.split('').slice(3).join('');
