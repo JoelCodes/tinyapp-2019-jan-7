@@ -42,10 +42,11 @@ app.get('/', (req, res) => {
 
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
+  console.log(idString);
   const inputURL = req.body.longURL;
   urlDatabase.push({tinyURL: idString, fullURL: inputURL});
   const goHere = `http://localhost:8080/u/${idString}`;
-  res.redirect(goHere);
+  res.redirect(302, goHere);
 });
 
 app.get('/u/:shortURL', (req, res) => {
@@ -57,7 +58,7 @@ app.get('/u/:shortURL', (req, res) => {
       goHere.push(item.fullURL);
     }
   }
-  res.redirect(goHere.join(''));
+  res.redirect(302, goHere.join(''));
 });
 
 app.listen(PORT, ()=> {
