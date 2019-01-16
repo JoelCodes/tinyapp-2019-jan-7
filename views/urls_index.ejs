@@ -7,12 +7,17 @@
   <header>
     <% include ./partials/_header %>
   </header>
- <h1>Shmoo's Tiny App</h1>
  <ul>
   <% urls.forEach((url) => { %>
-    <li><%= url.tinyURL %> - <%= url.fullURL %></li>
+    <li>
+      <%= url.tinyURL %> - <%= url.fullURL %>
+      <form method="POST" action="/urls/9sm5xK/delete">
+        <button>delete</button>
+      </form>
+    </li>
   <% }); %>
  </ul>
+
  <a href="#">Click here to shorten a new URL.</a>
 </body>
 </html>

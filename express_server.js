@@ -49,6 +49,12 @@ app.post('/urls', (req, res) => {
   res.redirect(302, goHere);
 });
 
+app.post('/urls/:id/delete', (req, res) => {
+  const toBeDel = req.params.id; // the id in the address bar
+  console.log(toBeDelIndex);
+  res.send("ok");
+});
+
 app.get('/u/:shortURL', (req, res) => {
   const idPath = req.originalUrl;
   const idString = idPath.split('').slice(3).join('');
