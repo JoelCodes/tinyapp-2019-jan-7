@@ -42,9 +42,16 @@ app.get('/', (req, res) => {
 
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
-  console.log(req.body);
-  res.send('Okie dokie');
+  const inputURL = req.body.longURL;
+  urlDatabase.push({tinyURL: idString, fullURL: inputURL});
+  const goHere = `http://localhost:8080/urls/${idString}`;
+  res.redirect(goHere);
 });
+
+// app.get('/u/:shortURL', (req, res){
+//   // let longURL = ...
+//   res.redirect(longURL);
+// });
 
 app.listen(PORT, ()=> {
   console.log(`Example app listening on port ${PORT}!`);
