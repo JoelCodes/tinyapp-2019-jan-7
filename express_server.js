@@ -88,5 +88,6 @@ function generateRandomString() {
 // a non-existent shortURL reveals header information but nothing else; but the status says "found" which... is untrue.
   // fixed! Now it sends an error message on the browser.
   // apparently it's not fixed.
+  // FIXED!
 // the urlDatabase is refreshed each time the server is restarted
 // 302, yo! It's a temporary redirect.
