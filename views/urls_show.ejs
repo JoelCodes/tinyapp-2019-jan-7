@@ -7,14 +7,16 @@
   <header>
     <% include ./partials/_header %>
   </header>
-<h1>Shmoo's Tiny App</h1>
 
-<p>Your tinyURL is <b><%= shortURL %></b>.</p>
+<p>ShortURL - <b><%= shortURL %></b>.</p>
 
-<p>Its full version is
+<p>
   <% longURL.forEach((item) => { %>
     <% if (item.tinyURL == shortURL) { %>
-    <b><%= item.fullURL %></b>
+  <form method="POST" action="/urls/<%= item.tinyURL %>">
+    <input type="" name="" placeholder="<%= item.fullURL %>">
+    <button>Edit</button>
+  </form>
   <% } %>
   <% }) %>
 </p>
