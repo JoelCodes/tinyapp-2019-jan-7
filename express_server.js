@@ -51,13 +51,13 @@ app.post('/urls', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const idPath = req.originalUrl;
   const idString = idPath.split('').slice(3).join('');
+  const goHere = [];
   for (let item of urlDatabase){
     if (item.tinyURL == idString){
-      return console.log(item.fullURL, idString);
+      goHere.push(item.fullURL);
     }
   }
-  // let longURL = req.params.id;
-  // res.redirect(longURL);
+  res.redirect(goHere.join(''));
 });
 
 app.listen(PORT, ()=> {
