@@ -74,10 +74,14 @@ app.post('/urls/:id/delete', (req, res) => {
 
 app.post('/urls/:id', (req, res) => {
   const idString = req.params.id; // the shortURL/id
-  console.log(test, "torst");
-  // change the urlDatabase array
   const newFull = req.body.newFull; // the contents of the input field
-  res.redirect('/urls/:id');
+  // change the urlDatabase array
+  for (let index in urlDatabase){
+    if (urlDatabase[index].tinyURL == idString){
+      urlDatabase[index].fullURL = newFull;
+    }
+  }
+  res.redirect(`/urls/${idString}`);
 });
 
 app.post('/urls', (req, res) => {
