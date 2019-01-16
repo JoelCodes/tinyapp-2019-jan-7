@@ -96,9 +96,10 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  res.cookie('name', 'username');
+  const userName = req.body.username;
+  console.log(userName);
+  res.cookie('username', userName);
   res.redirect('/urls');
-  //redirect to /urls
 });
 
 
