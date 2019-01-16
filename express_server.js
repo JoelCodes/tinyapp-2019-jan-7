@@ -37,8 +37,9 @@ app.get('/urls', (req, res) => {
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  const idPath = req.originalUrl;
-  const idString = idPath.split('').slice(3).join('');
+  // const idPath = req.originalUrl;
+  // const idString = idPath.split('').slice(3).join('');
+  const idString = req.params.id; // the shortURL/id
   const goHere = [];
   for (let item of urlDatabase){
     if (item.tinyURL == idString){
@@ -72,9 +73,7 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
-  const idPath = req.originalUrl;
-  const idString = idPath.split('').slice(6).join(''); // the id/shortURL
-  const test = req.params.id;
+  const idString = req.params.id; // the shortURL/id
   console.log(test, "torst");
   // change the urlDatabase array
   const newFull = req.body.newFull; // the contents of the input field
