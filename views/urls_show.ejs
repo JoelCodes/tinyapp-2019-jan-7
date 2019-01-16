@@ -14,7 +14,7 @@
   <% longURL.forEach((item) => { %>
     <% if (item.tinyURL == shortURL) { %>
   <form method="POST" action="/urls/<%= item.tinyURL %>">
-    <input type="" name="" placeholder="<%= item.fullURL %>">
+    <input type="text" name="newFull" placeholder="<%= item.fullURL %>">
     <button>Edit</button>
   </form>
   <% } %>

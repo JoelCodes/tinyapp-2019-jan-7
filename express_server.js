@@ -40,15 +40,6 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
-app.post('/urls', (req, res) => {
-  const idString = generateRandomString();
-  console.log("from post urls", idString);
-  const inputURL = req.body.longURL;
-  urlDatabase.push({tinyURL: idString, fullURL: inputURL});
-  const goHere = `http://localhost:8080/u/${idString}`;
-  res.redirect(302, goHere);
-});
-
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id; // the id in the address bar
   console.log(toBeDel);
@@ -61,9 +52,19 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
-  console.log("worked");
+  const test = req.body;
+  console.log(test);
   res.send('beep');
 })
+
+app.post('/urls', (req, res) => {
+  const idString = generateRandomString();
+  console.log("from post urls", idString);
+  const inputURL = req.body.longURL;
+  urlDatabase.push({tinyURL: idString, fullURL: inputURL});
+  const goHere = `http://localhost:8080/u/${idString}`;
+  res.redirect(302, goHere);
+});
 
 app.get('/u/:shortURL', (req, res) => {
   const idPath = req.originalUrl;
