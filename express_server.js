@@ -50,12 +50,12 @@ app.post('/urls', (req, res) => {
 
 app.get('/u/:shortURL', (req, res) => {
   const idPath = req.originalUrl;
-  const idString = idPath.split('').slice(3).join('')
-  // for (let item of urlDatabase){
-  //   console.log(item.fullURL);
-  // }
-  console.log(idString);
-  // console.log(req.originalUrl);
+  const idString = idPath.split('').slice(3).join('');
+  for (let item of urlDatabase){
+    if (item.tinyURL == idString){
+      return console.log(item.fullURL, idString);
+    }
+  }
   // let longURL = req.params.id;
   // res.redirect(longURL);
 });
