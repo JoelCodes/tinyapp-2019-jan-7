@@ -96,7 +96,8 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  // set a cookie named username to the value submitted in the login form (don't worry about options yet)
+  res.cookie('name', 'username');
+  res.redirect('/urls');
   //redirect to /urls
 });
 
