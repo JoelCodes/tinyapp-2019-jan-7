@@ -44,14 +44,19 @@ app.post('/urls', (req, res) => {
   const idString = generateRandomString();
   const inputURL = req.body.longURL;
   urlDatabase.push({tinyURL: idString, fullURL: inputURL});
-  const goHere = `http://localhost:8080/urls/${idString}`;
+  const goHere = `http://localhost:8080/u/${idString}`;
   res.redirect(goHere);
 });
 
-// app.get('/u/:shortURL', (req, res){
-//   // let longURL = ...
-//   res.redirect(longURL);
-// });
+app.get('/u/:shortURL', (req, res) => {
+  for (let item of urlDatabase){
+    console.log(item.fullURL);
+  }
+  // console.log(urlDatabase.fullURL);
+  // let longURL = req.params.id;
+  // console.log(longURL);
+  // res.redirect(longURL);
+});
 
 app.listen(PORT, ()=> {
   console.log(`Example app listening on port ${PORT}!`);
