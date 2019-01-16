@@ -87,9 +87,7 @@ app.post('/urls/:id', (req, res) => {
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
   const inputURL = req.body.longURL;
-  console.log(inputURL);
   urlDatabase.push({tinyURL: idString, fullURL: inputURL});
-  console.log(urlDatabase);
   const goHere = `http://localhost:8080/u/${idString}`;
   res.redirect(302, goHere);
 });

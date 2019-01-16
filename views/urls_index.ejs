@@ -11,6 +11,7 @@
   <% urls.forEach((url) => { %>
     <li>
       <%= url.tinyURL %> - <%= url.fullURL %>
+      <a href="/urls/<%= url.tinyURL %>">Edit</a>
       <form method="POST" action="/urls/<%= url.tinyURL  %>/delete">
         <button>delete</button>
       </form>
