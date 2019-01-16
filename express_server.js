@@ -23,6 +23,10 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+app.get('/urls/not-found', (res, req) => {
+  res.send('Sorry. That shortened URL is not in our database.')
+});
+
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
@@ -30,6 +34,24 @@ app.get('/urls.json', (req, res) => {
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase};
   res.render('urls_index', templateVars);
+});
+
+app.get('/u/:shortURL', (req, res) => {
+  const idPath = req.originalUrl;
+  console.log("idP", idPath);
+  const idString = idPath.split('').slice(3).join('');
+  const goHere = [];
+  for (let item of urlDatabase){
+    if (item.tinyURL == idString){
+      goHere.push(item.fullURL);
+    }
+  }
+  console.log("go", goHere);
+  if (goHere.length > 0){
+    res.redirect(302, goHere.join('')); //302, because this is a temporary redirect
+  } else {
+    res.redirect(404, 'http://localhost:8080/urls/not-found');
+  }
 });
 
 app.get('/hello', (req, res) => {
@@ -40,9 +62,11 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
+
+
+// POST requests
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id; // the id in the address bar
-  console.log(toBeDel);
   for (let index in urlDatabase){
     if(urlDatabase[index].tinyURL == toBeDel){
       urlDatabase.splice(index, 1);
@@ -52,43 +76,24 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
-  const test = req.body;
-  console.log(test);
+  const newFull = req.body.newFull; // the contents of the input field
+  console.log("newFull", newFull);
   res.send('beep');
 })
 
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
-  console.log("from post urls", idString);
   const inputURL = req.body.longURL;
+  console.log(inputURL);
   urlDatabase.push({tinyURL: idString, fullURL: inputURL});
+  console.log(urlDatabase);
   const goHere = `http://localhost:8080/u/${idString}`;
   res.redirect(302, goHere);
 });
 
-app.get('/u/:shortURL', (req, res) => {
-  const idPath = req.originalUrl;
-  const idString = idPath.split('').slice(3).join('');
-  const goHere = [];
-  for (let item of urlDatabase){
-    if (item.tinyURL == idString){
-      goHere.push(item.fullURL);
-    }
-  }
-  console.log(goHere.length);
-  if (goHere.length > 0){
-    res.redirect(302, goHere.join('')); //302, because this is a temporary redirect
-  } else {
-    res.redirect(404, '/not-found');
-  }
-});
-
-app.get('/not-found', (res, req) => {
-  res.send('Sorry. That shortened URL is not in our database.')
-});
 
 app.listen(PORT, ()=> {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Shmoo's tiny app listening on port ${PORT}!`);
 });
 
 function generateRandomString() {
