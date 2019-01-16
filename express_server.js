@@ -52,7 +52,14 @@ app.post('/urls', (req, res) => {
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id; // the id in the address bar
   console.log(toBeDel);
-  res.send("ok");
+  for (let index in urlDatabase){
+    if(urlDatabase[index].tinyURL == toBeDel){
+      console.log(index, urlDatabase[index]);
+      urlDatabase.splice(index, 1);
+    }
+  }
+  console.log(urlDatabase);
+  res.redirect('/urls');
 });
 
 app.get('/u/:shortURL', (req, res) => {
