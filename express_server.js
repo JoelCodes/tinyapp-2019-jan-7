@@ -49,12 +49,11 @@ app.post('/urls', (req, res) => {
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  for (let item of urlDatabase){
-    console.log(item.fullURL);
-  }
-  // console.log(urlDatabase.fullURL);
+  // for (let item of urlDatabase){
+  //   console.log(item.fullURL);
+  // }
+  console.log(req.originalUrl);
   // let longURL = req.params.id;
-  // console.log(longURL);
   // res.redirect(longURL);
 });
 
