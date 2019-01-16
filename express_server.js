@@ -54,11 +54,9 @@ app.post('/urls/:id/delete', (req, res) => {
   console.log(toBeDel);
   for (let index in urlDatabase){
     if(urlDatabase[index].tinyURL == toBeDel){
-      console.log(index, urlDatabase[index]);
       urlDatabase.splice(index, 1);
     }
   }
-  console.log(urlDatabase);
   res.redirect('/urls');
 });
 
