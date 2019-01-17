@@ -196,27 +196,13 @@ app.post('/urls', (req, res) => {
 app.post('/login', (req, res) => {
   const submittedEmail = req.body.email;
   const submittedPassword = req.body.password;
-
-  for (let user in users){
-
-    let databaseEmail = users[user].email;
-    let databasePassword = users[user].password;
-
-    if (databaseEmail !== submittedEmail || databasePassword !== submittedPassword){
-      return res.status(403).send('Sorry! The email or password you submitted is not in our database. <a href="/login">Try again</a>.');
-    } else if (databaseEmail === submittedEmail && databasePassword === submittedPassword){
-      res.cookie('user_id', users[user].id);
-      res.redirect('/');
-    }
+  const userID = findUser(submittedEmail, submittedPassword);
+  if (userID === undefined){
+    res.send('Sorry, pal. Your email or password do not match. <a href="/login">Try again</a>.');
+  } else {
+    res.cookie('user_id', users[userID].id);
+    res.redirect('/urls/');
   }
-  // if email/pass params match...
-    // sets a cookie
-    // redirects to '/urls'
-  // if do not match..
-    // error
-  // const userName = req.body.username;
-  // const sessionID = generateRandomString(); // THIS IS WRONG
-  // res.cookie('user_id', sessionID); // value will be a randomly generated key from the function -- WRONG!
 });
 
 app.post('/logout', (req, res) => {
@@ -264,6 +250,17 @@ function getUserObj (theCookie) {
   const userObj = users[theCookie];
   return userObj;
 }
+
+function findUser (email, password){
+  let output;
+  for (let user in users){
+    if (users[user].email == email && users[user].password == password){
+      output = users[user].id;
+      return output;
+    }
+  }
+}
+
 // edge cases:
 // a non-existent shortURL reveals header information but nothing else; but the status says "found" which... is untrue.
   // fixed! Now it sends an error message on the browser.
