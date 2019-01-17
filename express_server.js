@@ -52,7 +52,7 @@ app.get('/urls/:id', (req, res) => {
   // if logged in but doesn't own the URL with the ID
     // error
   let templateVars = {
-    username: req.cookies["username"],
+    user: getUserObj(req.cookies["user_id"]),
     // 'user_id': (users) => {
     //   for (let user in users){
     //     return users[user].id
@@ -83,7 +83,9 @@ app.get('/urls', (req, res) => {
     // a link, GET to '/urls/new'
   // if user is not logged int, return HTML with error
   let templateVars = {
-    username: req.cookies["username"],
+    // username: req.cookies["user_id"], // do not pass in the cookie. pass in the user object from the users object
+    // username: users[req.cookies["user_id"]],
+    user: getUserObj(req.cookies["user_id"]),
     urls: urlDatabase,
   };
   res.render('urls_index', templateVars);
@@ -193,7 +195,8 @@ app.post('/login', (req, res) => {
   // if do not match..
     // error
   const userName = req.body.username;
-  res.cookie('username', userName);
+  const randomUserCookie = generateRandomString();
+  res.cookie('user_id', randomUserCookie); // value will be a randomly generated key from the function
   res.redirect('/urls');
 });
 
@@ -205,15 +208,6 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  // if empty field
-    // error
-  // if email already exists
-    // error
-  // otherwise
-    // creates new user
-    // encrypts the password with `bcrypt`
-    // sets a cookie
-    // redirects to '/urls'
   for (let user in users){
     if (users[user].email == req.body.email){
       res.status(400).send("Email is already in the system.");
@@ -225,8 +219,8 @@ app.post('/register', (req, res) => {
       id: randomUserId,
       email: req.body.email,
       password: req.body.password
-    };
-    res.cookie('userID', randomUserId);
+    }; // MISSING: encrypt the password with `bcrpyt`
+    res.cookie('user_id', randomUserId);
     res.redirect('/urls');
   } else {
     res.status(400).send("Yeah, we can't exactly register you with empty fields...");
@@ -247,6 +241,10 @@ function generateRandomString() {
   return output.join('');
 }
 
+function getUserObj (theCookie) {
+  const userObj = users[theCookie];
+  return userObj;
+}
 // edge cases:
 // a non-existent shortURL reveals header information but nothing else; but the status says "found" which... is untrue.
   // fixed! Now it sends an error message on the browser.

@@ -1,6 +1,6 @@
 <h1>Shmoo's TinyApp</h1>
-<% if (username) { %>
-  <span>Hello <b><%= username %></b></span>
+<% if (user.id) { %>
+  <span>Hello <b><%= user.id %></b></span>
   <form method="POST" action="/logout">
     <input type="submit" value="Log Out">
   </form>
