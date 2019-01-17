@@ -222,7 +222,7 @@ app.post('/login', (req, res) => {
 app.post('/logout', (req, res) => {
   // deletes cookies
   // redirects to '/urls'
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
