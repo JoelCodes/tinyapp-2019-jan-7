@@ -83,8 +83,6 @@ app.get('/urls', (req, res) => {
     // a link, GET to '/urls/new'
   // if user is not logged int, return HTML with error
   let templateVars = {
-    // username: req.cookies["user_id"], // do not pass in the cookie. pass in the user object from the users object
-    // username: users[req.cookies["user_id"]],
     user: getUserObj(req.cookies["user_id"]),
     urls: urlDatabase,
   };
@@ -124,6 +122,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
+  const templateVars = {
+    user: getUserObj(req.cookies["user_id"]),
+  };
+  res.render('urls_login', templateVars);
   // if logged in
     // redirect to '/urls'
   // not logged in, returns HTML with...
@@ -195,8 +197,8 @@ app.post('/login', (req, res) => {
   // if do not match..
     // error
   const userName = req.body.username;
-  const randomUserCookie = generateRandomString();
-  res.cookie('user_id', randomUserCookie); // value will be a randomly generated key from the function
+  const sessionID = generateRandomString(); // THIS IS WRONG
+  res.cookie('user_id', sessionID); // value will be a randomly generated key from the function -- WRONG!
   res.redirect('/urls');
 });
 
