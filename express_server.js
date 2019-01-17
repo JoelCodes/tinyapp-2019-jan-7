@@ -194,13 +194,10 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  let counter = 0;
   for (let user in users){
-    if (users[user].email == email){
-      counter++;
-      console.log("yes", counter);
+    if (users[user].email === req.body.email && users[user].password === req.body.password){
+      res.cookie('user_id', users[user].id);
+      res.redirect('/urls');
     }
   }
   // if email/pass params match...
@@ -211,7 +208,6 @@ app.post('/login', (req, res) => {
   // const userName = req.body.username;
   // const sessionID = generateRandomString(); // THIS IS WRONG
   // res.cookie('user_id', sessionID); // value will be a randomly generated key from the function -- WRONG!
-  res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
