@@ -134,7 +134,7 @@ app.post('/logout', (req, res) => {
 app.post('/register', (req, res) => {
   for (let user in users){
     if (users[user].email == req.body.email){
-      console.log("ughhhh")
+      res.status(400).send("Email is already in the system.");
     }
   }
   if (req.body.email && req.body.password){
@@ -147,7 +147,7 @@ app.post('/register', (req, res) => {
     res.cookie('userID', randomUserId);
     res.redirect('/urls');
   } else {
-    res.redirect(400, "Yeah, we can't exactly register you with empty fields..."); //this is not how to do this
+    res.status(400).send("Yeah, we can't exactly register you with empty fields...");
   }
 })
 
