@@ -32,11 +32,18 @@ const users = {
 
 // GET routes are ordered from most to least specific
 app.get('/urls/new', (req, res) => {
+  let templateVars = {
+    user: getUserObj(req.cookies["user_id"]),
+  };
+  if (req.cookies.user_id){
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login');
+  }
   // if logged in, return HTML with...
     // site header
     // a form with text input for long URL, submit button POST '/urls'
   // if not logged in, redirect to '/login'
-  res.render('urls_new');
 });
 
 app.get('/urls/:id', (req, res) => {
