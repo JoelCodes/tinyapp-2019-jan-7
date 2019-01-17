@@ -194,14 +194,23 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let counter = 0;
+  for (let user in users){
+    if (users[user].email == email){
+      counter++;
+      console.log("yes", counter);
+    }
+  }
   // if email/pass params match...
     // sets a cookie
     // redirects to '/urls'
   // if do not match..
     // error
-  const userName = req.body.username;
-  const sessionID = generateRandomString(); // THIS IS WRONG
-  res.cookie('user_id', sessionID); // value will be a randomly generated key from the function -- WRONG!
+  // const userName = req.body.username;
+  // const sessionID = generateRandomString(); // THIS IS WRONG
+  // res.cookie('user_id', sessionID); // value will be a randomly generated key from the function -- WRONG!
   res.redirect('/urls');
 });
 
