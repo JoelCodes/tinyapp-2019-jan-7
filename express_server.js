@@ -132,14 +132,23 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const randomUserId = generateRandomString();
-  users[randomUserId] = {
-    id: randomUserId,
-    email: req.body.email,
-    password: req.body.password
-  };
-  res.cookie('userID', randomUserId);
-  res.redirect('/urls');
+  for (let user in users){
+    if (users[user].email == req.body.email){
+      console.log("ughhhh")
+    }
+  }
+  if (req.body.email && req.body.password){
+    const randomUserId = generateRandomString();
+    users[randomUserId] = {
+      id: randomUserId,
+      email: req.body.email,
+      password: req.body.password
+    };
+    res.cookie('userID', randomUserId);
+    res.redirect('/urls');
+  } else {
+    res.redirect(400, "Yeah, we can't exactly register you with empty fields..."); //this is not how to do this
+  }
 })
 
 app.listen(PORT, ()=> {
