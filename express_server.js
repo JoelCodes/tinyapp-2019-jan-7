@@ -131,6 +131,9 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/register', (req, res) => {
+  console.log(req.body.email, req.body.password);
+})
 
 app.listen(PORT, ()=> {
   console.log(`Shmoo's tiny app listening on port ${PORT}!`);
