@@ -13,8 +13,8 @@ app.set('view engine', 'ejs');
 
 // universal variables
 const urlDatabase = [
-  { tinyURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca'},
-  { tinyURL: '9sm5xK', fullURL: 'http://www.google.com'},
+  { tinyURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca', owner: "userRandomID"},
+  { tinyURL: '9sm5xK', fullURL: 'http://www.google.com', owner: "user2RandomID"},
   ];
 
 const users = {
@@ -116,7 +116,7 @@ app.get('/u/:shortURL', (req, res) => { // I may need to rename this to '/u/:id'
   } else {
     return res.status(404).send('Sorry. That shortened URL is not in our database.');
   }
-});
+}); // SOMETHING HAS GONE WEIRD HERE...
 
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World</b></body></html>\n');
@@ -195,7 +195,7 @@ app.post('/urls', (req, res) => {
     // returns error message
   const idString = generateRandomString();
   const inputURL = req.body.longURL;
-  urlDatabase.push({tinyURL: idString, fullURL: inputURL});
+  urlDatabase.push({tinyURL: idString, fullURL: inputURL, owner: req.cookies.user_id});
   const goHere = `http://localhost:8080/u/${idString}`;
   res.redirect(302, goHere);
 });
