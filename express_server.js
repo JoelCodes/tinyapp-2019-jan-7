@@ -132,7 +132,12 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  console.log(req.body.email, req.body.password);
+  const randomUserId = generateRandomString();
+  users[randomUserId] = {
+    id: randomUserId,
+    email: req.body.email,
+    password: req.body.password
+  };
 })
 
 app.listen(PORT, ()=> {
