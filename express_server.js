@@ -137,7 +137,10 @@ app.get('/register', (req, res) => {
     // redirect to /urls
   // not logged in, return HTML with...
     // a form to register (form with email/pass, button POST '/register')
-  res.render('urls_register');
+  const templateVars = {
+    user: getUserObj(req.cookies["user_id"]),
+  };
+  res.render('urls_register', templateVars);
 })
 
 // POST requests
