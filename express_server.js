@@ -32,12 +32,32 @@ const users = {
 
 // GET routes are ordered from most to least specific
 app.get('/urls/new', (req, res) => {
+  // if logged in, return HTML with...
+    // site header
+    // a form with text input for long URL, submit button POST '/urls'
+  // if not logged in, redirect to '/login'
   res.render('urls_new');
 });
 
 app.get('/urls/:id', (req, res) => {
+  // if logged in and owns the URL for the given ID, return HTML with...
+    // site header
+    // short URL for the given ID
+    // a form with corresponding long URL, update button that POSTs to '/urls/:id'
+    // (more stretch)
+  // if URL for the ID does not exist
+    // returns HTML with relevant error message
+  // if not logged in
+    // returns HTML with error
+  // if logged in but doesn't own the URL with the ID
+    // error
   let templateVars = {
     username: req.cookies["username"],
+    // 'user_id': (users) => {
+    //   for (let user in users){
+    //     return users[user].id
+    //   }
+    // },
     shortURL: req.params.id,
     longURL: urlDatabase,
   };
@@ -53,6 +73,15 @@ app.get('/urls.json', (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
+  // if user is logged in, return HTML with...
+    // a site header
+    // a list of the URLs the user has created including...
+      // a short URL and matching long URL
+      // edit button, GET to '/urls/:id'
+      // delete button, POST to '/urls/:id/delete'
+      // (others in stretch)
+    // a link, GET to '/urls/new'
+  // if user is not logged int, return HTML with error
   let templateVars = {
     username: req.cookies["username"],
     urls: urlDatabase,
@@ -60,7 +89,12 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-app.get('/u/:shortURL', (req, res) => {
+app.get('/u/:shortURL', (req, res) => { // I may need to rename this to '/u/:id'
+  // if URL for ID exists...
+    // redirect to URL
+  // else
+    // error message
+
   // const idPath = req.originalUrl;
   // const idString = idPath.split('').slice(3).join('');
   const idString = req.params.id; // the shortURL/id
@@ -82,15 +116,35 @@ app.get('/hello', (req, res) => {
 });
 
 app.get('/', (req, res) => {
+  // if user is logged in, redirect to '/urls'
+  // if user is not logged in, redirect to '/login'
   res.send('Hello!');
 });
 
+app.get('/login', (req, res) => {
+  // if logged in
+    // redirect to '/urls'
+  // not logged in, returns HTML with...
+    // a form with input fields (email and pass), submit POST to '/login'
+})
+
 app.get('/register', (req, res) => {
+  // logged in
+    // redirect to /urls
+  // not logged in, return HTML with...
+    // a form to register (form with email/pass, button POST '/register')
   res.render('urls_register');
 })
 
 // POST requests
 app.post('/urls/:id/delete', (req, res) => {
+  // logged in && owns URL/ID
+    // deletes the URL
+    // redirects to /urls
+  // not logged in
+    // returns error
+  // does not own
+    // error
   const toBeDel = req.params.id; // the id in the address bar
   for (let index in urlDatabase){
     if(urlDatabase[index].tinyURL == toBeDel){
@@ -101,6 +155,13 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
+  // logged in && owns URL for given ID
+    // update the URL
+    // redirects to /urls
+  // not logged int
+    // error message
+  // does not own
+    // error
   const idString = req.params.id; // the shortURL/id
   const newFull = req.body.newFull; // the contents of the input field
   // change the urlDatabase array
@@ -113,6 +174,11 @@ app.post('/urls/:id', (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
+  // if logged in...
+    // generate short URL, saves it, associates it with the user
+    // redirects to '/urls/:id', where :id matches the ID of the newly saved URL
+  // not logged in...
+    // returns error message
   const idString = generateRandomString();
   const inputURL = req.body.longURL;
   urlDatabase.push({tinyURL: idString, fullURL: inputURL});
@@ -121,17 +187,33 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+  // if email/pass params match...
+    // sets a cookie
+    // redirects to '/urls'
+  // if do not match..
+    // error
   const userName = req.body.username;
   res.cookie('username', userName);
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
+  // deletes cookies
+  // redirects to '/urls'
   res.clearCookie('username');
   res.redirect('/urls');
 });
 
 app.post('/register', (req, res) => {
+  // if empty field
+    // error
+  // if email already exists
+    // error
+  // otherwise
+    // creates new user
+    // encrypts the password with `bcrypt`
+    // sets a cookie
+    // redirects to '/urls'
   for (let user in users){
     if (users[user].email == req.body.email){
       res.status(400).send("Email is already in the system.");
