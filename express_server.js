@@ -21,12 +21,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "cow"
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "sow"
   }
 };
 
@@ -105,9 +105,9 @@ app.get('/u/:shortURL', (req, res) => { // I may need to rename this to '/u/:id'
     }
   }
   if (goHere.length > 0){
-    res.redirect(302, goHere.join('')); //302, because this is a temporary redirect
+    return res.redirect(302, goHere.join('')); //302, because this is a temporary redirect
   } else {
-    res.redirect(404, 'http://localhost:8080/urls/not-found');
+    return res.status(404).send('Sorry. That shortened URL is not in our database.');
   }
 });
 
@@ -194,10 +194,19 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+  const submittedEmail = req.body.email;
+  const submittedPassword = req.body.password;
+
   for (let user in users){
-    if (users[user].email === req.body.email && users[user].password === req.body.password){
+
+    let databaseEmail = users[user].email;
+    let databasePassword = users[user].password;
+
+    if (databaseEmail !== submittedEmail || databasePassword !== submittedPassword){
+      return res.status(403).send('Sorry! The email or password you submitted is not in our database. <a href="/login">Try again</a>.');
+    } else if (databaseEmail === submittedEmail && databasePassword === submittedPassword){
       res.cookie('user_id', users[user].id);
-      res.redirect('/urls');
+      res.redirect('/');
     }
   }
   // if email/pass params match...
