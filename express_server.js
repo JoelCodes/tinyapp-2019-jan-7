@@ -138,6 +138,8 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: req.body.password
   };
+  res.cookie('userID', randomUserId);
+  res.redirect('/urls');
 })
 
 app.listen(PORT, ()=> {
