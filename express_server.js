@@ -1,3 +1,4 @@
+// setting up the modules and middleware
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -10,11 +11,24 @@ app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 
-
+// universal variables
 const urlDatabase = [
   { tinyURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca'},
   { tinyURL: '9sm5xK', fullURL: 'http://www.google.com'},
   ];
+
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
 
 // GET routes are ordered from most to least specific
 app.get('/urls/new', (req, res) => {
