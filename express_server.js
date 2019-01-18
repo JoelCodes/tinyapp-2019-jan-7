@@ -1,3 +1,4 @@
+"use strict";
 // setting up the modules and middleware
 const express = require('express');
 const app = express();
