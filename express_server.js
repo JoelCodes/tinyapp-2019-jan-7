@@ -12,6 +12,7 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 
 const bcrypt = require('bcrypt');
+const user1PW = bcrypt.hashSync('cow', 10);
 
 
 // universal variables
@@ -25,7 +26,7 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "cow"
+    password: user1PW,
   },
   "user2RandomID": {
     id: "user2RandomID",
@@ -209,14 +210,21 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+  // does email match a user in the database?
   const submittedEmail = req.body.email;
-  const submittedPassword = req.body.password;
-  const userID = findUser(submittedEmail, submittedPassword);
-  if (userID === undefined){
-    res.send('Sorry, pal. Your email or password do not match. <a href="/login">Try again</a>.');
-  } else {
+  const emailMatchCheck = emailMatchChecker(submittedEmail); // boolean
+
+  // does hashed input password match hashed stored password?
+  const storedPassword = findPassword(submittedEmail); // using the email address, return the stored (hashed) password
+  const passwordMatchCheck = bcrypt.compareSync(req.body.password, storedPassword); //boolean
+
+  const userID = findUser(submittedEmail);
+
+  if (emailMatchCheck && passwordMatchCheck){
     res.cookie('user_id', users[userID].id);
     res.redirect('/urls/');
+  } else if (!emailMatchCheck || !passwordMatchCheck){
+    res.send('Sorry, pal. Your email or password do not match. <a href="/login">Try again</a>.');
   }
 });
 
@@ -262,15 +270,15 @@ function generateRandomString() {
   return output.join('');
 }
 
-function getUserObj (theCookie) {
+function getUserObj(theCookie) {
   const userObj = users[theCookie];
   return userObj;
 }
 
-function findUser (email, password){
+function findUser(email){//, password){
   let output;
   for (let user in users){
-    if (users[user].email === email && users[user].password === password){
+    if (users[user].email === email){//} && users[user].password === password){
       output = users[user].id;
       return output;
     }
@@ -297,10 +305,20 @@ function urlsForUserObj(id){
   return ownedURLs;
 }
 
-// edge cases:
-// a non-existent shortURL reveals header information but nothing else; but the status says "found" which... is untrue.
-  // fixed! Now it sends an error message on the browser.
-  // apparently it's not fixed.
-  // FIXED!
-// the urlDatabase is refreshed each time the server is restarted
-// 302, yo! It's a temporary redirect.
+function emailMatchChecker(email){
+  for (let user in users){
+    if (users[user].email === email){
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+function findPassword(email){
+  for (let user in users){
+    if (users[user].email === email){
+      return users[user].password;
+    }
+  }
+}
