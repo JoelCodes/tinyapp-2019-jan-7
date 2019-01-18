@@ -7,20 +7,37 @@
   <header>
     <% include ./partials/_header %>
   </header>
- <ul>
-  <% urls.forEach((url) => { %>
-    <li>
-      <%= url.tinyURL %> - <%= url.fullURL %>
-      <% if (user.id === url.owner) { %>
-        <a href="/urls/<%= url.tinyURL %>">Edit</a>
-        <form method="POST" action="/urls/<%= url.tinyURL  %>/delete">
-          <button>delete</button>
-        </form>
-      <% } %>
-    </li>
-  <% }); %>
- </ul>
+  <br />
+  <table>
+    <thead>
+      <tr>
+        <th>Short IDs</th>
+        <th>Full URLs</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% urls.forEach((url) => { %>
+      <tr>
+        <td><%= url.tinyURL %></td>
+        <td><%= url.fullURL %></td>
+        <% if (user.id === url.owner) { %>
+        <td>
+          <form method="GET" action="/urls/<%= url.tinyURL %>">
+            <button>edit</button>
+          </form>
+        </td>
+        <td>
+          <form method="POST" action="/urls/<%= url.tinyURL  %>/delete">
+            <button>delete</button>
+          </form>
+        </td>
+        <% } %>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
 
- <a href="/urls/new">Click here to shorten a new URL.</a>
+  <br/>
+  <a href="/urls/new">Click here to shorten a new URL.</a>
 </body>
 </html>

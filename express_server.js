@@ -1,4 +1,5 @@
 "use strict";
+
 // setting up the modules and middleware
 const express = require('express');
 const app = express();
@@ -52,19 +53,30 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:id', (req, res) => {
+  const user = getUserObj(req.session.user_id); // object
   let templateVars = {
-    user: getUserObj(req.session.user_id), // object
+    user: user, // object
     shortURL: req.params.id,
-    longURL: urlsForUser(req.session.user_id), // array
+    yourURLs: urlsForUser(req.session.user_id), // array
   };
+  // const usersURLs = urlsForUserObj(req.session.user_id);
 
-  const usersURLs = urlsForUserObj(req.session.user_id);
-  if (!req.session.user_id){
-    res.send('Try <a href="/login">logging in</a> first.');
-  } else if (req.session.user_id !== usersURLs.urls.owner) {
-    res.send('That URL does not belong to you. 😾');
-  } else if (req.session.user_id){
-    res.render('urls_show', templateVars);
+  // if we have the shortURL in the database
+  if (urlDatabaseChecker(req.params.id)){
+    // if user is not logged in
+    if (!req.session.user_id){
+      res.send('Try <a href="/login">logging in</a> first.');
+
+    // if the URL does not belong to user
+    } else if (!isThisYours(req.params.id, req.session.user_id)){ // (req.session.user_id !== usersURLs.owner) {
+      res.send('That URL does not belong to you. 😾');
+    } else if (req.session.user_id){
+      res.render('urls_show', templateVars);
+    }
+  } else {
+    // console.log(req.params.id);
+    // console.log(urlDatabaseChecker('9sm5xK'));
+    res.send('That URL is not in the database. Would you like to <a href="/register">make a new one</a>?');
   }
 });
 
@@ -99,7 +111,7 @@ app.get('/u/:id', (req, res) => {
   if (goHere.length > 0){
     return res.redirect(302, goHere.join('')); //302, because this is a temporary redirect
   } else {
-    return res.status(404).send('Sorry. That shortened URL is not in our database.');
+    return res.status(404).send('Sorry. That shortened URL is not in our database. Would you like to <a href="/urls/new">make one</a>?');
   }
 });
 
@@ -108,21 +120,33 @@ app.get('/hello', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  if (req.session.user_id){
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
 });
 
 app.get('/login', (req, res) => {
-  const templateVars = {
-    user: getUserObj(req.session.user_id),
-  };
-  res.render('urls_login', templateVars);
+  if (!req.session.user_id){
+    const templateVars = {
+      user: getUserObj(req.session.user_id),
+    };
+    res.render('urls_login', templateVars);
+  } else {
+    res.redirect('/urls');
+  }
 })
 
 app.get('/register', (req, res) => {
-  const templateVars = {
-    user: getUserObj(req.session.user_id),
-  };
-  res.render('urls_register', templateVars);
+  if (!req.session.user_id){
+    const templateVars = {
+      user: getUserObj(req.session.user_id),
+    };
+    res.render('urls_register', templateVars);
+  } else {
+    res.redirect('/urls');
+  }
 })
 
 // POST requests
@@ -137,22 +161,22 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
-    const idString = req.params.id;
-    const newFull = req.body.newFull;
-    for (let index in urlDatabase){
-      if (urlDatabase[index].tinyURL === idString){
-        urlDatabase[index].fullURL = newFull;
-      }
+  const idString = req.params.id;
+  const newFull = req.body.newFull;
+  for (let index in urlDatabase){
+    if (urlDatabase[index].tinyURL === idString){
+      urlDatabase[index].fullURL = newFull;
     }
-    res.redirect(`/urls/${idString}`);
-
+  }
+  res.redirect(`/urls/${idString}`);
 });
 
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
   const inputURL = req.body.longURL;
   urlDatabase.push({tinyURL: idString, fullURL: inputURL, owner: req.session.user_id});
-  console.log(req.session.user_id);
+  // console.log("caw", req.session.user_id);
+  // console.log("BAW", );
   res.redirect(`/urls/${idString}`);
 });
 
@@ -165,13 +189,13 @@ app.post('/login', (req, res) => {
   const storedPassword = findPassword(submittedEmail); // using the email address, return the stored (hashed) password
   const passwordMatchCheck = bcrypt.compareSync(req.body.password, storedPassword); //boolean
 
-  const userID = findUser(submittedEmail);
+  const userID = findUserID(submittedEmail);
 
   if (emailMatchCheck && passwordMatchCheck){
     req.session.user_id = users[userID].id;
-    res.redirect('/urls/');
+    res.redirect('/urls');
   } else if (!emailMatchCheck || !passwordMatchCheck){
-    res.send('Sorry, pal. Your email or password do not match. <a href="/login">Try again</a>.');
+    res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>.');
   }
 });
 
@@ -183,7 +207,7 @@ app.post('/logout', (req, res) => {
 app.post('/register', (req, res) => {
   for (let user in users){
     if (users[user].email === req.body.email){
-      res.status(400).send("Email is already in the system.");
+      res.status(400).send('Email is already in the system. Try <a href="/login">logging in</a>.');
     }
   }
   if (req.body.email && req.body.password){
@@ -195,7 +219,7 @@ app.post('/register', (req, res) => {
     };
     res.redirect('/urls');
   } else {
-    res.status(400).send("Yeah, we can't exactly register you with empty fields...");
+    res.status(400).send('Yeah, we can\'t exactly register you with empty fields... <a href="/register">Try again</a>.');
   }
 })
 
@@ -218,7 +242,7 @@ function getUserObj(theCookie) {
   return userObj;
 }
 
-function findUser(email){
+function findUserID(email){
   let output;
   for (let user in users){
     if (users[user].email === email){
@@ -242,7 +266,7 @@ function urlsForUserObj(id){
   let ownedURLs = {};
   urlDatabase.forEach((url) => {
     if (url.owner === id){
-      ownedURLs.urls = url;
+      ownedURLs = url;
     }
   });
   return ownedURLs;
@@ -260,6 +284,24 @@ function findPassword(email){
   for (let user in users){
     if (users[user].email === email){
       return users[user].password;
+    }
+  }
+}
+
+function urlDatabaseChecker(shortURL){
+  for (let url of urlDatabase){
+    if (url.tinyURL === shortURL){
+      return true;
+    }
+  }
+}
+
+function isThisYours(shortURL, userID){
+  for (let url of urlDatabase){
+    if (url.tinyURL === shortURL){
+      if (url.owner === userID){
+        return true;
+      }
     }
   }
 }

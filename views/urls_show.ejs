@@ -1,25 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>TinyApp</title>
-</head>
-<body>
-  <header>
-    <% include ./partials/_header %>
-  </header>
+  <head>
+    <title>TinyApp</title>
+  </head>
 
-<p>ShortURL - <b><%= shortURL %></b>.</p>
-
-<p>
-  <% longURL.forEach((item) => { %>
-    <% if (item.tinyURL == shortURL) { %>
-  <form method="POST" action="/urls/<%= item.tinyURL %>">
-    <input type="text" name="newFull" placeholder="<%= item.fullURL %>">
-    <button>Edit</button>
-  </form>
-  <% } %>
+  <body>
+    <header>
+      <% include ./partials/_header %>
+    </header>
+  <% yourURLs.forEach((item) => { %>
+    <% if (item.tinyURL === shortURL) { %>
+      <p>ShortURL - <b><%= shortURL %></b></p>
+      <p>
+        <form method="POST" action="/urls/<%= item.tinyURL %>">
+          <input type="text" name="newFull" placeholder="<%= item.fullURL %>">
+          <button>Edit</button>
+        </form>
+      </p>
+    <% } %>
   <% }) %>
-</p>
-
-</body>
+  </body>
 </html>

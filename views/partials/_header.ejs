@@ -1,11 +1,13 @@
 <h1>Shmoo's TinyApp</h1>
+
 <% if (user !== undefined) { %>
-  <span>Hello <b><%= user.id %></b></span>
+  <span>
+    Hello <b><%= user.email %></b></span>
   <form method="POST" action="/logout">
     <input type="submit" value="Log Out">
   </form>
 <% } else { %>
-  <span> Please
-    <a href="/login">log in</a> or <a href="/register">register</a>.
+  <span>
+    Please <a href="/login">log in</a> or <a href="/register">register</a>.
   </span>
 <% } %>
