@@ -40,7 +40,7 @@ const users = {
   }
 };
 
-// GET routes are ordered from most to least specific
+// GET routes (from most to least specific)
 app.get('/urls/new', (req, res) => {
   let templateVars = {
     user: getUserObj(req.session.user_id),
@@ -53,39 +53,23 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:id', (req, res) => {
-  const user = getUserObj(req.session.user_id); // object
+  const user = getUserObj(req.session.user_id);
   let templateVars = {
     user: user, // object
     shortURL: req.params.id,
     yourURLs: urlsForUser(req.session.user_id), // array
   };
-  // const usersURLs = urlsForUserObj(req.session.user_id);
-
-  // if we have the shortURL in the database
   if (urlDatabaseChecker(req.params.id)){
-    // if user is not logged in
     if (!req.session.user_id){
       res.send('Try <a href="/login">logging in</a> first.');
-
-    // if the URL does not belong to user
-    } else if (!isThisYours(req.params.id, req.session.user_id)){ // (req.session.user_id !== usersURLs.owner) {
+    } else if (!isThisYours(req.params.id, req.session.user_id)){
       res.send('That URL does not belong to you. 😾');
     } else if (req.session.user_id){
       res.render('urls_show', templateVars);
     }
   } else {
-    // console.log(req.params.id);
-    // console.log(urlDatabaseChecker('9sm5xK'));
-    res.send('That URL is not in the database. Would you like to <a href="/register">make a new one</a>?');
+    res.send('That URL is not in the database. 😞 Would you like to <a href="/register">make a new one</a>?');
   }
-});
-
-app.get('/urls/not-found', (res, req) => {
-  res.send('Sorry. That shortened URL is not in our database.')
-});
-
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
 });
 
 app.get('/urls', (req, res) => {
@@ -101,7 +85,7 @@ app.get('/urls', (req, res) => {
 });
 
 app.get('/u/:id', (req, res) => {
-  const idString = req.params.id; // the shortURL/id
+  const idString = req.params.id;
   const goHere = [];
   for (let item of urlDatabase){
     if (item.tinyURL === idString){
@@ -109,14 +93,10 @@ app.get('/u/:id', (req, res) => {
     }
   }
   if (goHere.length > 0){
-    return res.redirect(302, goHere.join('')); //302, because this is a temporary redirect
+    return res.redirect(302, goHere.join(''));
   } else {
-    return res.status(404).send('Sorry. That shortened URL is not in our database. Would you like to <a href="/urls/new">make one</a>?');
+    return res.status(404).send('Sorry. That URL is not in our database. 😞 Would you like to <a href="/urls/new">make one</a>?');
   }
-});
-
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
 });
 
 app.get('/', (req, res) => {
@@ -129,9 +109,7 @@ app.get('/', (req, res) => {
 
 app.get('/login', (req, res) => {
   if (!req.session.user_id){
-    const templateVars = {
-      user: getUserObj(req.session.user_id),
-    };
+    const templateVars = { user: getUserObj(req.session.user_id) };
     res.render('urls_login', templateVars);
   } else {
     res.redirect('/urls');
@@ -149,9 +127,9 @@ app.get('/register', (req, res) => {
   }
 })
 
-// POST requests
+// POST requests (most to least specific)
 app.post('/urls/:id/delete', (req, res) => {
-  const toBeDel = req.params.id; // the id in the address bar
+  const toBeDel = req.params.id;
   for (let index in urlDatabase){
     if(urlDatabase[index].tinyURL === toBeDel){
       urlDatabase.splice(index, 1);
@@ -227,6 +205,7 @@ app.listen(PORT, ()=> {
   console.log(`Shmoo's tiny app listening on port ${PORT}!`);
 });
 
+// HELPER functions
 function generateRandomString() {
   const everyAlphaNum = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`;
   const output = [];
@@ -257,16 +236,6 @@ function urlsForUser(id) {
   urlDatabase.forEach((url) => {
     if (url.owner === id){
       ownedURLs.push(url);
-    }
-  });
-  return ownedURLs;
-}
-
-function urlsForUserObj(id){
-  let ownedURLs = {};
-  urlDatabase.forEach((url) => {
-    if (url.owner === id){
-      ownedURLs = url;
     }
   });
   return ownedURLs;
