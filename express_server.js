@@ -196,8 +196,7 @@ app.post('/urls', (req, res) => {
   const idString = generateRandomString();
   const inputURL = req.body.longURL;
   urlDatabase.push({tinyURL: idString, fullURL: inputURL, owner: req.cookies.user_id});
-  const goHere = `http://localhost:8080/u/${idString}`;
-  res.redirect(302, goHere);
+  res.redirect(`/urls/${idString}`);
 });
 
 app.post('/login', (req, res) => {
