@@ -11,6 +11,9 @@ app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 
+const bcrypt = require('bcrypt');
+
+
 // universal variables
 const urlDatabase = [
   { tinyURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca', owner: "userRandomID"},
@@ -235,8 +238,9 @@ app.post('/register', (req, res) => {
     users[randomUserId] = {
       id: randomUserId,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10),
     }; // MISSING: encrypt the password with `bcrpyt`
+    console.log(users);
     res.cookie('user_id', randomUserId);
     res.redirect('/urls');
   } else {
