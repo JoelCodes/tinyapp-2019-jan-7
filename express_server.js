@@ -48,6 +48,20 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:id', (req, res) => {
+  let templateVars = {
+    user: getUserObj(req.cookies["user_id"]), // object
+    shortURL: req.params.id,
+    longURL: urlsForUser(req.cookies["user_id"]), // array
+  };
+
+  const usersURLs = urlsForUserObj(req.cookies["user_id"]);
+  if (!req.cookies["user_id"]){
+    res.send('Try <a href="/login">logging in</a> first.');
+  } else if (req.cookies["user_id"] !== usersURLs.urls.owner) {
+    res.send('That URL does not belong to you. 😾');
+  } else if (req.cookies["user_id"]){
+    res.render('urls_show', templateVars);
+  }
   // if logged in and owns the URL for the given ID, return HTML with...
     // site header
     // short URL for the given ID
@@ -59,17 +73,6 @@ app.get('/urls/:id', (req, res) => {
     // returns HTML with error
   // if logged in but doesn't own the URL with the ID
     // error
-  let templateVars = {
-    user: getUserObj(req.cookies["user_id"]),
-    // 'user_id': (users) => {
-    //   for (let user in users){
-    //     return users[user].id
-    //   }
-    // },
-    shortURL: req.params.id,
-    longURL: urlsForUser(req.cookies["user_id"]),
-  };
-  res.render('urls_show', templateVars);
 });
 
 app.get('/urls/not-found', (res, req) => {
@@ -181,7 +184,6 @@ app.post('/urls/:id', (req, res) => {
     // error message
   // does not own
     // error
-  if (req.cookies["user_id"]){
     const idString = req.params.id;
     const newFull = req.body.newFull;
     for (let index in urlDatabase){
@@ -190,7 +192,7 @@ app.post('/urls/:id', (req, res) => {
       }
     }
     res.redirect(`/urls/${idString}`);
-  }
+
 });
 
 app.post('/urls', (req, res) => {
@@ -278,6 +280,16 @@ function urlsForUser(id) {
   urlDatabase.forEach((url) => {
     if (url.owner === id){
       ownedURLs.push(url);
+    }
+  });
+  return ownedURLs;
+}
+
+function urlsForUserObj(id){
+  let ownedURLs = {};
+  urlDatabase.forEach((url) => {
+    if (url.owner === id){
+      ownedURLs.urls = url;
     }
   });
   return ownedURLs;
