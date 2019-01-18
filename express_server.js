@@ -15,6 +15,7 @@ app.set('view engine', 'ejs');
 const urlDatabase = [
   { tinyURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca', owner: "userRandomID"},
   { tinyURL: '9sm5xK', fullURL: 'http://www.google.com', owner: "user2RandomID"},
+  { tinyURL: 'C2xVn2', fullURL: 'http://www.blighthouselabs.ca', owner: "userRandomID"},
   ];
 
 const users = {
@@ -66,7 +67,7 @@ app.get('/urls/:id', (req, res) => {
     //   }
     // },
     shortURL: req.params.id,
-    longURL: urlDatabase,
+    longURL: urlsForUser(req.cookies["user_id"]),
   };
   res.render('urls_show', templateVars);
 });
@@ -89,11 +90,15 @@ app.get('/urls', (req, res) => {
       // (others in stretch)
     // a link, GET to '/urls/new'
   // if user is not logged int, return HTML with error
-  let templateVars = {
-    user: getUserObj(req.cookies["user_id"]),
-    urls: urlDatabase,
-  };
-  res.render('urls_index', templateVars);
+  if (req.cookies["user_id"]){
+    let templateVars = {
+      user: getUserObj(req.cookies["user_id"]),
+      urls: urlsForUser(req.cookies["user_id"]),
+    };
+    res.render('urls_index', templateVars);
+  } else {
+    res.send('You need to <a href="/login">log in</a> to see your shortened URLs.')
+  }
 });
 
 app.get('/u/:shortURL', (req, res) => { // I may need to rename this to '/u/:id'
@@ -107,7 +112,7 @@ app.get('/u/:shortURL', (req, res) => { // I may need to rename this to '/u/:id'
   const idString = req.params.id; // the shortURL/id
   const goHere = [];
   for (let item of urlDatabase){
-    if (item.tinyURL == idString){
+    if (item.tinyURL === idString){
       goHere.push(item.fullURL);
     }
   }
@@ -161,7 +166,7 @@ app.post('/urls/:id/delete', (req, res) => {
     // error
   const toBeDel = req.params.id; // the id in the address bar
   for (let index in urlDatabase){
-    if(urlDatabase[index].tinyURL == toBeDel){
+    if(urlDatabase[index].tinyURL === toBeDel){
       urlDatabase.splice(index, 1);
     }
   }
@@ -176,15 +181,16 @@ app.post('/urls/:id', (req, res) => {
     // error message
   // does not own
     // error
-  const idString = req.params.id; // the shortURL/id
-  const newFull = req.body.newFull; // the contents of the input field
-  // change the urlDatabase array
-  for (let index in urlDatabase){
-    if (urlDatabase[index].tinyURL == idString){
-      urlDatabase[index].fullURL = newFull;
+  if (req.cookies["user_id"]){
+    const idString = req.params.id;
+    const newFull = req.body.newFull;
+    for (let index in urlDatabase){
+      if (urlDatabase[index].tinyURL === idString){
+        urlDatabase[index].fullURL = newFull;
+      }
     }
+    res.redirect(`/urls/${idString}`);
   }
-  res.redirect(`/urls/${idString}`);
 });
 
 app.post('/urls', (req, res) => {
@@ -220,7 +226,7 @@ app.post('/logout', (req, res) => {
 
 app.post('/register', (req, res) => {
   for (let user in users){
-    if (users[user].email == req.body.email){
+    if (users[user].email === req.body.email){
       res.status(400).send("Email is already in the system.");
     }
   }
@@ -260,11 +266,21 @@ function getUserObj (theCookie) {
 function findUser (email, password){
   let output;
   for (let user in users){
-    if (users[user].email == email && users[user].password == password){
+    if (users[user].email === email && users[user].password === password){
       output = users[user].id;
       return output;
     }
   }
+}
+
+function urlsForUser(id) {
+  let ownedURLs = [];
+  urlDatabase.forEach((url) => {
+    if (url.owner === id){
+      ownedURLs.push(url);
+    }
+  });
+  return ownedURLs;
 }
 
 // edge cases:
