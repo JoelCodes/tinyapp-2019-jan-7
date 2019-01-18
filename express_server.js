@@ -104,14 +104,12 @@ app.get('/urls', (req, res) => {
   }
 });
 
-app.get('/u/:shortURL', (req, res) => { // I may need to rename this to '/u/:id'
+app.get('/u/:id', (req, res) => {
   // if URL for ID exists...
     // redirect to URL
   // else
     // error message
 
-  // const idPath = req.originalUrl;
-  // const idString = idPath.split('').slice(3).join('');
   const idString = req.params.id; // the shortURL/id
   const goHere = [];
   for (let item of urlDatabase){
