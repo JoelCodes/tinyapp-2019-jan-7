@@ -247,8 +247,7 @@ app.post('/register', (req, res) => {
       id: randomUserId,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10),
-    }; // MISSING: encrypt the password with `bcrpyt`
-    console.log(users);
+    };
     res.cookie('user_id', randomUserId);
     res.redirect('/urls');
   } else {
@@ -309,8 +308,6 @@ function emailMatchChecker(email){
   for (let user in users){
     if (users[user].email === email){
       return true;
-    } else {
-      return false;
     }
   }
 }
