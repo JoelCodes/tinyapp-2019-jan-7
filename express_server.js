@@ -132,7 +132,8 @@ app.get('/register', (req, res) => {
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id;
   databaseObjRemover(toBeDel);
-  res.redirect('/urls');
+  app.use(methodOverride('_method'));
+  // res.redirect('/urls');
 });
 
 app.post('/urls/:id', (req, res) => {
@@ -162,10 +163,10 @@ app.post('/login', (req, res) => {
     const userID = findUserID(submittedEmail);
     if (passwordMatchCheck) {
       req.session.user_id = users[userID].id;
-      res.redirect('/urls');
+      return res.redirect('/urls');
     }
   }
-  res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
+  return res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
 });
 
 app.post('/logout', (req, res) => {
@@ -239,6 +240,7 @@ function emailMatchChecker(email) {
       return true;
     }
   }
+  return false;
 }
 
 function findPassword(email) {
