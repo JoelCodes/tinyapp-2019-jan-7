@@ -57,16 +57,16 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:id', (req, res) => {
+  const longURL = matchLongUrl(urlsForUser(req.session.user_id), req.params.id);
+  const userID = req.session.user_id;
+
   const templateVars = {
+    userID,
+    longURL,
     user: getUserObj(req.session.user_id),
     shortURL: req.params.id,
-    yourURLs: urlsForUser(req.session.user_id), // array
   };
-  // IN PROGRESS
-  // urlsForUser - return obj
-  // urls_show.ejs - remove forEach()
-  // SNAG - the urlsForUser() is used by a render that NEEDS an array (or does it...no! you can iterate through an object!)
-  // okay, so urls_index.ejs has to iterate through the object
+
   if (urlDatabaseChecker(req.params.id)) {
     if (!req.session.user_id) {
       res.send('Try <a href="/login">logging in</a> first.');
@@ -221,10 +221,12 @@ function findUserID(email) {
 }
 
 function urlsForUser(id) {
-  const ownedURLs = [];
+  const ownedURLs = {};
+  let counter = 0;
   urlDatabase.forEach((url) => {
     if (url.owner === id) {
-      ownedURLs.push(url);
+      counter++;
+      ownedURLs[counter] = url;
     }
   });
   return ownedURLs;
