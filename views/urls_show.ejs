@@ -8,16 +8,12 @@
     <header>
       <% include ./partials/_header %>
     </header>
-  <% yourURLs.forEach((item) => { %>
-    <% if (item.tinyURL === shortURL) { %>
       <p>ShortURL - <b><%= shortURL %></b></p>
       <p>
         <form method="POST" action="/urls/<%= item.tinyURL %>">
-          <input type="text" name="newFull" placeholder="<%= item.fullURL %>" style="width: 200px;">
+          <input type="text" name="newFull" placeholder="<%= longURL %>" style="width: 200px;">
           <button>Edit</button>
         </form>
       </p>
-    <% } %>
-  <% }) %>
   </body>
 </html>

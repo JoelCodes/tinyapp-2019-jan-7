@@ -57,11 +57,16 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:id', (req, res) => {
+  const longURL = matchLongUrl(urlsForUser(req.session.user_id), req.params.id);
+  const userID = req.session.user_id;
+
   const templateVars = {
+    userID,
+    longURL,
     user: getUserObj(req.session.user_id),
     shortURL: req.params.id,
-    yourURLs: urlsForUser(req.session.user_id), // array
   };
+
   if (urlDatabaseChecker(req.params.id)) {
     if (!req.session.user_id) {
       res.send('Try <a href="/login">logging in</a> first.');
@@ -78,8 +83,8 @@ app.get('/urls/:id', (req, res) => {
 app.get('/urls', (req, res) => {
   if (req.session.user_id) {
     const templateVars = {
-      user: getUserObj(req.session.user_id),
-      urls: urlsForUser(req.session.user_id),
+      user: getUserObj(req.session.user_id),  // obj
+      urls: urlsForUser(req.session.user_id), // arr
     };
     res.render('urls_index', templateVars);
   } else {
@@ -217,10 +222,12 @@ function findUserID(email) {
 }
 
 function urlsForUser(id) {
-  const ownedURLs = [];
+  const ownedURLs = {};
+  let counter = 0;
   urlDatabase.forEach((url) => {
     if (url.owner === id) {
-      ownedURLs.push(url);
+      counter++;
+      ownedURLs[counter] = url;
     }
   });
   return ownedURLs;
