@@ -164,7 +164,7 @@ app.post('/login', (req, res) => {
   const emailMatchCheck = emailMatchChecker(submittedEmail); // boolean
 
   // does hashed input password match hashed stored password?
-  const storedPassword = findPassword(submittedEmail); // using the email address, return the stored (hashed) password
+  const storedPassword = findPassword(submittedEmail);
   const passwordMatchCheck = bcrypt.compareSync(req.body.password, storedPassword); //boolean
 
   const userID = findUserID(submittedEmail);
@@ -173,7 +173,7 @@ app.post('/login', (req, res) => {
     req.session.user_id = users[userID].id;
     res.redirect('/urls');
   } else if (!emailMatchCheck || !passwordMatchCheck){
-    res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>.');
+    res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
   }
 });
 
@@ -199,7 +199,7 @@ app.post('/register', (req, res) => {
   } else {
     res.status(400).send('Yeah, we can\'t exactly register you with empty fields... <a href="/register">Try again</a>.');
   }
-})
+});
 
 app.listen(PORT, ()=> {
   console.log(`Shmoo's tiny app listening on port ${PORT}!`);
