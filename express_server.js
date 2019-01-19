@@ -187,10 +187,8 @@ app.post('/logout', (req, res) => {
 
 app.post('/register', (req, res) => {
   // checks if user is in system
-  for (const user in users) {
-    if (users[user].email === req.body.email) {
-      res.status(400).send('Email is already in the system. Try <a href="/login">logging in</a>.');
-    }
+  if (emailMatchChecker(req.body.email)){
+    res.status(400).send('Email is already in the system. Try <a href="/login">logging in</a>.');
   }
   if (req.body.email && req.body.password) {
     req.session.user_id = generateRandomString();
