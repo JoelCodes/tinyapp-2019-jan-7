@@ -13,7 +13,7 @@
       <p>ShortURL - <b><%= shortURL %></b></p>
       <p>
         <form method="POST" action="/urls/<%= item.tinyURL %>">
-          <input type="text" name="newFull" placeholder="<%= item.fullURL %>">
+          <input type="text" name="newFull" placeholder="<%= item.fullURL %>" style="width: 200px;">
           <button>Edit</button>
         </form>
       </p>

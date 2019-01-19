@@ -5,6 +5,12 @@
   <form method="POST" action="/logout">
     <input type="submit" value="Log Out">
   </form>
+  <form method="GET" action="/urls">
+    <button>Your URLs</button>
+  </form>
+  <form method="GET" action="/urls/new">
+    <button>Make Another!</button>
+  </form>
 <% } else { %>
   <span>
     Please <a href="/login">log in</a> or <a href="/register">register</a>.
