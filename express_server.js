@@ -57,9 +57,8 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:id', (req, res) => {
-  const user = getUserObj(req.session.user_id);
   const templateVars = {
-    user: user, // object
+    user: getUserObj(req.session.user_id),
     shortURL: req.params.id,
     yourURLs: urlsForUser(req.session.user_id), // array
   };
@@ -129,7 +128,6 @@ app.get('/register', (req, res) => {
 // POST requests (most to least specific)
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id;
-  // finds and removes an object from the database
   databaseObjRemover(toBeDel);
   res.redirect('/urls');
 });
@@ -138,7 +136,7 @@ app.post('/urls/:id', (req, res) => {
   const shortUrl = req.params.id;
   if (req.session.user_id && isThisYours(shortUrl, req.session.user_id)){
     const newFull = inputUrlFixer(req.body.newFull);
-    addToDatabase(newFull);
+    addToDatabase(newFull, shortUrl); // addToDatabase() AND editDatabase()
     res.redirect(`/urls/${shortUrl}`);
   } else {
     res.send('Sorry, pal. You can\'t do that. Are you <a href="/login">logged in</a> to the right account?')
@@ -301,7 +299,7 @@ function databaseObjRemover(toBeDel) {
   }
 }
 
-function addToDatabase(shortUrl, newFull) {
+function addToDatabase(newFull, shortUrl) {
   for (const index in urlDatabase) {
     if (urlDatabase[index].tinyURL === shortUrl) {
       urlDatabase[index].fullURL = newFull;
