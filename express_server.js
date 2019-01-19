@@ -145,7 +145,7 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post('/urls/:id', (req, res) => {
   const idString = req.params.id;
   if (req.session.user_id && isThisYours(idString, req.session.user_id)){
-    const newFull = req.body.newFull;
+    const newFull = inputUrlFixer(req.body.newFull);
     for (const index in urlDatabase) {
       if (urlDatabase[index].tinyURL === idString) {
         urlDatabase[index].fullURL = newFull;
