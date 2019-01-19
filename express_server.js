@@ -144,21 +144,23 @@ app.post('/urls/:id/delete', (req, res) => {
 
 app.post('/urls/:id', (req, res) => {
   const idString = req.params.id;
-  const newFull = req.body.newFull;
-  for (const index in urlDatabase) {
-    if (urlDatabase[index].tinyURL === idString) {
-      urlDatabase[index].fullURL = newFull;
+  if (req.session.user_id && isThisYours(idString, req.session.user_id)){
+    const newFull = req.body.newFull;
+    for (const index in urlDatabase) {
+      if (urlDatabase[index].tinyURL === idString) {
+        urlDatabase[index].fullURL = newFull;
+      }
     }
+    res.redirect(`/urls/${idString}`);
+  } else {
+    res.send('Sorry, pal. You can\'t do that. Are you <a href="/login">logged in</a> to the right account?')
   }
-  res.redirect(`/urls/${idString}`);
 });
 
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
   const inputURL = req.body.longURL;
   urlDatabase.push({ tinyURL: idString, fullURL: inputURL, owner: req.session.user_id });
-  // console.log("caw", req.session.user_id);
-  // console.log("BAW", );
   res.redirect(`/urls/${idString}`);
 });
 
