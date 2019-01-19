@@ -65,6 +65,8 @@ app.get('/urls/:id', (req, res) => {
   // IN PROGRESS
   // urlsForUser - return obj
   // urls_show.ejs - remove forEach()
+  // SNAG - the urlsForUser() is used by a render that NEEDS an array (or does it...no! you can iterate through an object!)
+  // okay, so urls_index.ejs has to iterate through the object
   if (urlDatabaseChecker(req.params.id)) {
     if (!req.session.user_id) {
       res.send('Try <a href="/login">logging in</a> first.');
