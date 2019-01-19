@@ -130,11 +130,7 @@ app.get('/register', (req, res) => {
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id;
   // finds and removes an object from the database
-  for (const index in urlDatabase) {
-    if (urlDatabase[index].tinyURL === toBeDel) {
-      urlDatabase.splice(index, 1);
-    }
-  }
+  databaseObjRemover(toBeDel);
   res.redirect('/urls');
 });
 
@@ -186,7 +182,6 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  // checks if user is in system
   if (emailMatchChecker(req.body.email)){
     res.status(400).send('Email is already in the system. Try <a href="/login">logging in</a>.');
   }
@@ -305,4 +300,12 @@ function findLongUrl(idStr) {
     }
   }
   return longUrl;
+}
+
+function databaseObjRemover(toBeDel) {
+  for (const index in urlDatabase) {
+    if (urlDatabase[index].tinyURL === toBeDel) {
+      urlDatabase.splice(index, 1);
+    }
+  }
 }
