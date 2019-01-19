@@ -62,6 +62,9 @@ app.get('/urls/:id', (req, res) => {
     shortURL: req.params.id,
     yourURLs: urlsForUser(req.session.user_id), // array
   };
+  // IN PROGRESS
+  // urlsForUser - return obj
+  // urls_show.ejs - remove forEach()
   if (urlDatabaseChecker(req.params.id)) {
     if (!req.session.user_id) {
       res.send('Try <a href="/login">logging in</a> first.');
@@ -78,8 +81,8 @@ app.get('/urls/:id', (req, res) => {
 app.get('/urls', (req, res) => {
   if (req.session.user_id) {
     const templateVars = {
-      user: getUserObj(req.session.user_id),
-      urls: urlsForUser(req.session.user_id),
+      user: getUserObj(req.session.user_id),  // obj
+      urls: urlsForUser(req.session.user_id), // arr
     };
     res.render('urls_index', templateVars);
   } else {
