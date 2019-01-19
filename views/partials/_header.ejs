@@ -1,8 +1,7 @@
 <h1>Shmoo's TinyApp</h1>
 
 <% if (user !== undefined) { %>
-  <span>
-    Hello <b><%= user.email %></b></span>
+  <span>Logged in as <b><%= user.email %></b></span>
   <form method="POST" action="/logout">
     <input type="submit" value="Log Out">
   </form>

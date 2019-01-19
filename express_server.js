@@ -159,7 +159,7 @@ app.post('/urls/:id', (req, res) => {
 
 app.post('/urls', (req, res) => {
   const idString = generateRandomString();
-  const inputURL = req.body.longURL;
+  const inputURL = inputUrlFixer(req.body.longURL);
   urlDatabase.push({ tinyURL: idString, fullURL: inputURL, owner: req.session.user_id });
   res.redirect(`/urls/${idString}`);
 });
@@ -278,5 +278,25 @@ function isThisYours(shortURL, userID) {
         return true;
       }
     }
+  }
+}
+
+function inputUrlFixer(url) {
+  const checkHttpWww = url.split('').splice(0, 11).join('');
+  const checkWww = url.split('').splice(0, 4).join('');
+  if (checkHttpWww === 'http://www.') {
+      return url;
+  } else if (checkWww === 'www') {
+    url = url.split('').reverse();
+    url.push('http://');
+    url.reverse();
+    url = url.join('');
+    return url;
+  } else {
+    url = url.split('').reverse();
+    url.push('http://www.');
+    url.reverse();
+    url = url.join('');
+    return url;
   }
 }
