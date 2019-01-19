@@ -139,7 +139,7 @@ app.post('/urls/:id', (req, res) => {
   const shortUrl = req.params.id;
   if (req.session.user_id && isThisYours(shortUrl, req.session.user_id)){
     const newFull = inputUrlFixer(req.body.newFull);
-    addToDatabase(newFull, shortUrl); // addToDatabase() AND editDatabase()
+    addToDatabase(newFull, shortUrl);
     res.redirect(`/urls/${shortUrl}`);
   } else {
     res.send('Sorry, pal. You can\'t do that. Are you <a href="/login">logged in</a> to the right account?')
