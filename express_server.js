@@ -137,14 +137,8 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post('/urls/:id', (req, res) => {
   const shortUrl = req.params.id;
   if (req.session.user_id && isThisYours(shortUrl, req.session.user_id)){
-    // creates new database obj
     const newFull = inputUrlFixer(req.body.newFull);
-    for (const index in urlDatabase) {
-      if (urlDatabase[index].tinyURL === shortUrl) {
-        urlDatabase[index].fullURL = newFull;
-      }
-    }
-    //
+    addToDatabase(newFull);
     res.redirect(`/urls/${shortUrl}`);
   } else {
     res.send('Sorry, pal. You can\'t do that. Are you <a href="/login">logged in</a> to the right account?')
@@ -159,12 +153,9 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  // does email match a user in the database?
   const submittedEmail = req.body.email;
   const emailMatchCheck = emailMatchChecker(submittedEmail); // boolean
-
   if (emailMatchCheck){
-    // does hashed input password match hashed stored password?
     const storedPassword = findPassword(submittedEmail);
     const passwordMatchCheck = bcrypt.compareSync(req.body.password, storedPassword); // boolean
     const userID = findUserID(submittedEmail);
@@ -306,6 +297,14 @@ function databaseObjRemover(toBeDel) {
   for (const index in urlDatabase) {
     if (urlDatabase[index].tinyURL === toBeDel) {
       urlDatabase.splice(index, 1);
+    }
+  }
+}
+
+function addToDatabase(shortUrl, newFull) {
+  for (const index in urlDatabase) {
+    if (urlDatabase[index].tinyURL === shortUrl) {
+      urlDatabase[index].fullURL = newFull;
     }
   }
 }
