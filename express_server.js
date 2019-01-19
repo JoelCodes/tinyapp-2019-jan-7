@@ -169,18 +169,17 @@ app.post('/login', (req, res) => {
   const submittedEmail = req.body.email;
   const emailMatchCheck = emailMatchChecker(submittedEmail); // boolean
 
-  // does hashed input password match hashed stored password?
-  const storedPassword = findPassword(submittedEmail);
-  const passwordMatchCheck = bcrypt.compareSync(req.body.password, storedPassword); // boolean
-
-  const userID = findUserID(submittedEmail);
-
-  if (emailMatchCheck && passwordMatchCheck) {
-    req.session.user_id = users[userID].id;
-    res.redirect('/urls');
-  } else if (!emailMatchCheck || !passwordMatchCheck) {
-    res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
+  if (emailMatchCheck){
+    // does hashed input password match hashed stored password?
+    const storedPassword = findPassword(submittedEmail);
+    const passwordMatchCheck = bcrypt.compareSync(req.body.password, storedPassword); // boolean
+    const userID = findUserID(submittedEmail);
+    if (passwordMatchCheck) {
+      req.session.user_id = users[userID].id;
+      res.redirect('/urls');
+    }
   }
+  res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
 });
 
 app.post('/logout', (req, res) => {
