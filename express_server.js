@@ -89,9 +89,7 @@ app.get('/urls', (req, res) => {
 
 app.get('/u/:id', (req, res) => {
   const shortUrl = req.params.id;
-  // returns array
-  const goHere = findLongUrl(shortUrl);
-
+  const goHere = findLongUrl(shortUrl); // array
   if (goHere.length > 0) {
     return res.redirect(302, goHere.join(''));
   } else {
