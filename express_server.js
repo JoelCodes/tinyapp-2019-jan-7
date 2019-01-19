@@ -89,13 +89,10 @@ app.get('/urls', (req, res) => {
 });
 
 app.get('/u/:id', (req, res) => {
-  const idString = req.params.id;
-  const goHere = [];
-  for (const item of urlDatabase) {
-    if (item.tinyURL === idString) {
-      goHere.push(item.fullURL);
-    }
-  }
+  const shortUrl = req.params.id;
+  // returns array
+  const goHere = findLongUrl(shortUrl);
+
   if (goHere.length > 0) {
     return res.redirect(302, goHere.join(''));
   } else {
@@ -122,9 +119,7 @@ app.get('/login', (req, res) => {
 
 app.get('/register', (req, res) => {
   if (!req.session.user_id) {
-    const templateVars = {
-      user: getUserObj(req.session.user_id),
-    };
+    const templateVars = { user: getUserObj(req.session.user_id) };
     res.render('urls_register', templateVars);
   } else {
     res.redirect('/urls');
@@ -134,6 +129,7 @@ app.get('/register', (req, res) => {
 // POST requests (most to least specific)
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id;
+  // finds and removes an object from the database
   for (const index in urlDatabase) {
     if (urlDatabase[index].tinyURL === toBeDel) {
       urlDatabase.splice(index, 1);
@@ -143,25 +139,27 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
-  const idString = req.params.id;
-  if (req.session.user_id && isThisYours(idString, req.session.user_id)){
+  const shortUrl = req.params.id;
+  if (req.session.user_id && isThisYours(shortUrl, req.session.user_id)){
+    // creates new database obj
     const newFull = inputUrlFixer(req.body.newFull);
     for (const index in urlDatabase) {
-      if (urlDatabase[index].tinyURL === idString) {
+      if (urlDatabase[index].tinyURL === shortUrl) {
         urlDatabase[index].fullURL = newFull;
       }
     }
-    res.redirect(`/urls/${idString}`);
+    //
+    res.redirect(`/urls/${shortUrl}`);
   } else {
     res.send('Sorry, pal. You can\'t do that. Are you <a href="/login">logged in</a> to the right account?')
   }
 });
 
 app.post('/urls', (req, res) => {
-  const idString = generateRandomString();
+  const randomStr = generateRandomString();
   const inputURL = inputUrlFixer(req.body.longURL);
-  urlDatabase.push({ tinyURL: idString, fullURL: inputURL, owner: req.session.user_id });
-  res.redirect(`/urls/${idString}`);
+  urlDatabase.push({ tinyURL: randomStr, fullURL: inputURL, owner: req.session.user_id });
+  res.redirect(`/urls/${randomStr}`);
 });
 
 app.post('/login', (req, res) => {
@@ -188,6 +186,7 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
+  // checks if user is in system
   for (const user in users) {
     if (users[user].email === req.body.email) {
       res.status(400).send('Email is already in the system. Try <a href="/login">logging in</a>.');
@@ -298,4 +297,14 @@ function inputUrlFixer(url) {
     url = url.join('');
     return url;
   }
+}
+
+function findLongUrl(idStr) {
+  const longUrl = [];
+  for (const item of urlDatabase) {
+    if (item.tinyURL === idStr) {
+      longUrl.push(item.fullURL);
+    }
+  }
+  return longUrl;
 }
