@@ -132,8 +132,8 @@ app.get('/register', (req, res) => {
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id;
   databaseObjRemover(toBeDel);
-  app.use(methodOverride('_method'));
-  // res.redirect('/urls');
+  // app.use(methodOverride('_method'));
+  res.redirect('/urls');
 });
 
 app.post('/urls/:id', (req, res) => {
