@@ -22,12 +22,12 @@
         <td><%= urls[url].fullURL %></td>
         <% if (user.id === urls[url].owner) { %>
         <td>
-          <form method="GET" action="/urls/<%= url.tinyURL %>">
+          <form method="GET" action="/urls/<%= urls[url].tinyURL %>">
             <button>edit</button>
           </form>
         </td>
         <td>
-          <form method="POST" action="/urls/<%= url.tinyURL  %>/delete">
+          <form method="POST" action="/urls/<%= urls[url].tinyURL  %>/delete">
             <button>delete</button>
           </form>
         </td>
