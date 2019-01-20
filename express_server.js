@@ -130,13 +130,7 @@ app.get('/register', (req, res) => {
 });
 
 // POST requests (most to least specific)
-app.post('/urls/:id/delete', (req, res) => {
-  const toBeDel = req.params.id;
-  databaseObjRemover(toBeDel);
-  res.redirect('/urls');
-});
-
-app.post('/urls/:id', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   const shortUrl = req.params.id;
   if (req.session.user_id && isThisYours(shortUrl, req.session.user_id)){
     const newFull = inputUrlFixer(req.body.newFull);
@@ -146,7 +140,7 @@ app.post('/urls/:id', (req, res) => {
     res.send('Sorry, pal. You can\'t do that. Are you <a href="/login">logged in</a> to the right account?')
   }
 })
-  .delete('/urls/:id', (req, res) => {
+ .delete('/urls/:id', (req, res) => {
   const toBeDel = req.params.id;
   databaseObjRemover(toBeDel);
   res.redirect('/urls');
