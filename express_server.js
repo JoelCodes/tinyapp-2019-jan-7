@@ -1,5 +1,6 @@
 'use strict';
 
+/* eslint no-use-before-define: "off" */
 // setting up the modules and middleware
 const express = require('express');
 
@@ -7,15 +8,18 @@ const app = express();
 const PORT = 8080;
 
 const bodyParser = require('body-parser');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cookieSession = require('cookie-session');
+
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'],
 }));
 
 const methodOverride = require('method-override');
+
 app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
@@ -168,7 +172,7 @@ app.post('/login', (req, res) => {
   return res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
 });
 
-app.post('/logout', (req, res) => {
+app.post('/logout', (req, res) => { // leave as post
   res.clearCookie('session');
   res.clearCookie('session.sig');
   res.redirect('/urls');
