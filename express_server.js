@@ -314,3 +314,13 @@ function addToDatabase(newFull, shortUrl) {
     }
   }
 }
+
+function matchLongUrl (urlsNestObj, shortUrl) {
+  let url;
+  for (let item in urlsNestObj){
+    if (urlsNestObj[item].tinyURL === shortUrl) {
+      url = urlsNestObj[item].fullURL;
+    }
+  }
+  return url;
+}
