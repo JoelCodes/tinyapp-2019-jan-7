@@ -7,15 +7,16 @@ const app = express();
 const PORT = 8080;
 
 const bodyParser = require('body-parser');
-
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cookieSession = require('cookie-session');
-
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'],
 }));
+
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 
@@ -132,7 +133,6 @@ app.get('/register', (req, res) => {
 app.post('/urls/:id/delete', (req, res) => {
   const toBeDel = req.params.id;
   databaseObjRemover(toBeDel);
-  // app.use(methodOverride('_method'));
   res.redirect('/urls');
 });
 
@@ -145,6 +145,11 @@ app.post('/urls/:id', (req, res) => {
   } else {
     res.send('Sorry, pal. You can\'t do that. Are you <a href="/login">logged in</a> to the right account?')
   }
+})
+  .delete('/urls/:id', (req, res) => {
+  const toBeDel = req.params.id;
+  databaseObjRemover(toBeDel);
+  res.redirect('/urls');
 });
 
 app.post('/urls', (req, res) => {

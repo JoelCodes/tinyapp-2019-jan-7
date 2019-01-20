@@ -27,8 +27,8 @@
           </form>
         </td>
         <td>
-          <form method="POST" action="/urls/<%= urls[url].tinyURL  %>/delete">
-            <button>delete</button>
+          <form method="POST" action="/urls/<%= urls[url].tinyURL  %>?_method=DELETE">
+            <button type="submit">delete</button>
           </form>
         </td>
         <% } %>
