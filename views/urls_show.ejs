@@ -10,7 +10,7 @@
     </header>
       <p>ShortURL - <b><%= shortURL %></b></p>
       <p>
-        <form method="POST" action="/urls/<%= item.tinyURL %>">
+        <form method="POST" action="/urls/<%= shortURL %>?_method=PUT">
           <input type="text" name="newFull" placeholder="<%= longURL %>" style="width: 200px;">
           <button>Edit</button>
         </form>

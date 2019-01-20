@@ -1,5 +1,6 @@
 'use strict';
 
+/* eslint no-use-before-define: "off" */
 // setting up the modules and middleware
 const express = require('express');
 
@@ -16,6 +17,10 @@ app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'],
 }));
+
+const methodOverride = require('method-override');
+
+app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 
@@ -129,21 +134,20 @@ app.get('/register', (req, res) => {
 });
 
 // POST requests (most to least specific)
-app.post('/urls/:id/delete', (req, res) => {
-  const toBeDel = req.params.id;
-  databaseObjRemover(toBeDel);
-  res.redirect('/urls');
-});
-
-app.post('/urls/:id', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   const shortUrl = req.params.id;
   if (req.session.user_id && isThisYours(shortUrl, req.session.user_id)){
     const newFull = inputUrlFixer(req.body.newFull);
-    addToDatabase(newFull, shortUrl); // addToDatabase() AND editDatabase()
+    addToDatabase(newFull, shortUrl);
     res.redirect(`/urls/${shortUrl}`);
   } else {
     res.send('Sorry, pal. You can\'t do that. Are you <a href="/login">logged in</a> to the right account?')
   }
+})
+ .delete('/urls/:id', (req, res) => {
+  const toBeDel = req.params.id;
+  databaseObjRemover(toBeDel);
+  res.redirect('/urls');
 });
 
 app.post('/urls', (req, res) => {
@@ -162,13 +166,13 @@ app.post('/login', (req, res) => {
     const userID = findUserID(submittedEmail);
     if (passwordMatchCheck) {
       req.session.user_id = users[userID].id;
-      res.redirect('/urls');
+      return res.redirect('/urls');
     }
   }
-  res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
+  return res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
 });
 
-app.post('/logout', (req, res) => {
+app.post('/logout', (req, res) => { // leave as post
   res.clearCookie('session');
   res.clearCookie('session.sig');
   res.redirect('/urls');
@@ -239,6 +243,7 @@ function emailMatchChecker(email) {
       return true;
     }
   }
+  return false;
 }
 
 function findPassword(email) {
@@ -311,4 +316,14 @@ function addToDatabase(newFull, shortUrl) {
       urlDatabase[index].fullURL = newFull;
     }
   }
+}
+
+function matchLongUrl (urlsNestObj, shortUrl) {
+  let url;
+  for (let item in urlsNestObj){
+    if (urlsNestObj[item].tinyURL === shortUrl) {
+      url = urlsNestObj[item].fullURL;
+    }
+  }
+  return url;
 }
