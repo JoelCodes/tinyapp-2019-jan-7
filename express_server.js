@@ -36,7 +36,6 @@ MongoClient.connect('mongodb://localhost:27017', (err, client) => {
 // universal variables
 const urlDatabase = [];
 
-const users = {};
 
 app.use((req, res, next) => {
   getUserObj(req.session.user_id, (err, user) => {
@@ -212,7 +211,6 @@ function insertUser(email, password, cb){
       cb(null, result.ops[0]);
     }
   });
-  return users[id];
 }
 
 function getUserObj(id, cb) {
@@ -220,14 +218,6 @@ function getUserObj(id, cb) {
 
   // cb(null, userObj);
   usersColl.findOne({id}, cb)
-}
-
-function findUserID(email) {
-  for (const user in users) {
-    if (users[user].email === email) {
-      return users[user].id;
-    }
-  }
 }
 
 function urlsForUser(id) {
@@ -246,14 +236,6 @@ function emailMatchChecker(email, cb) {
   usersColl.findOne({email}, (err, result) => {
     cb(err, !!result);
   })
-}
-
-function findPassword(email) {
-  for (const user in users) {
-    if (users[user].email === email) {
-      return users[user].password;
-    }
-  }
 }
 
 function urlDatabaseChecker(shortURL) {
