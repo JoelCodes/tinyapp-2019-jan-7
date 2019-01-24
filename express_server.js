@@ -30,11 +30,7 @@ const user1PW = bcrypt.hashSync('cow', 10);
 
 
 // universal variables
-const urlDatabase = [
-  { tinyURL: 'b2xVn2', fullURL: 'http://www.lighthouselabs.ca', owner: 'userRandomID' },
-  { tinyURL: '9sm5xK', fullURL: 'http://www.google.com', owner: 'user2RandomID' },
-  { tinyURL: 'C2xVn2', fullURL: 'http://www.blighthouselabs.ca', owner: 'userRandomID' },
-];
+const urlDatabase = [];
 
 const users = {
   userRandomID: {
@@ -183,12 +179,8 @@ app.post('/register', (req, res) => {
     res.status(400).send('Email is already in the system. Try <a href="/login">logging in</a>.');
   }
   if (req.body.email && req.body.password) {
-    req.session.user_id = generateRandomString();
-    users[req.session.user_id] = {
-      id: req.session.user_id,
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 10),
-    };
+    const newUser = insertUser(req.body.email, req.body.password);
+    req.session.user_id = newUser.id;
     res.redirect('/urls');
   } else {
     res.status(400).send('Yeah, we can\'t exactly register you with empty fields... <a href="/register">Try again</a>.');
@@ -202,25 +194,31 @@ app.listen(PORT, () => {
 // HELPER functions
 function generateRandomString() {
   const everyAlphaNum = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-  const output = [];
+  const output = "";
   for (let i = 0; i < 6; i++) {
-    const randomIndex = Math.floor(Math.random() * Math.floor(61));
-    output.push(everyAlphaNum[randomIndex]);
+    const randomIndex = Math.floor(Math.random() * 62);
+    output += everyAlphaNum[randomIndex];
   }
-  return output.join('');
+  return output;
 }
 
+function insertUser(email, password){
+  const id = generateRandomString();
+  users[id] = {
+    id, email, 
+    password: bcrypt.hashSync(password, 10)
+  };;
+  return users[id];
+}
 function getUserObj(theCookie) {
   const userObj = users[theCookie];
   return userObj;
 }
 
 function findUserID(email) {
-  let output;
   for (const user in users) {
     if (users[user].email === email) {
-      output = users[user].id;
-      return output;
+      return users[user].id;
     }
   }
 }
@@ -265,11 +263,10 @@ function urlDatabaseChecker(shortURL) {
 function isThisYours(shortURL, userID) {
   for (const url of urlDatabase) {
     if (url.tinyURL === shortURL) {
-      if (url.owner === userID) {
-        return true;
-      }
+      return url.owner === userID;
     }
   }
+  return false;
 }
 
 function inputUrlFixer(url) {
@@ -306,6 +303,7 @@ function databaseObjRemover(toBeDel) {
   for (const index in urlDatabase) {
     if (urlDatabase[index].tinyURL === toBeDel) {
       urlDatabase.splice(index, 1);
+      return;
     }
   }
 }
@@ -314,16 +312,15 @@ function addToDatabase(newFull, shortUrl) {
   for (const index in urlDatabase) {
     if (urlDatabase[index].tinyURL === shortUrl) {
       urlDatabase[index].fullURL = newFull;
+      return;
     }
   }
 }
 
 function matchLongUrl (urlsNestObj, shortUrl) {
-  let url;
   for (let item in urlsNestObj){
     if (urlsNestObj[item].tinyURL === shortUrl) {
-      url = urlsNestObj[item].fullURL;
+      return urlsNestObj[item].fullURL;
     }
   }
-  return url;
 }
