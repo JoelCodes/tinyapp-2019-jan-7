@@ -3,6 +3,7 @@
 /* eslint no-use-before-define: "off" */
 // setting up the modules and middleware
 const express = require('express');
+const MongoClient = require('mongodb').MongoClient
 
 const app = express();
 const PORT = 8080;
@@ -25,30 +26,29 @@ app.use(methodOverride('_method'));
 app.set('view engine', 'ejs');
 
 const bcrypt = require('bcrypt');
-
-const user1PW = bcrypt.hashSync('cow', 10);
-
-
+MongoClient.connect('mongodb://localhost:27017', (err, client) => {
+  if(err){
+    console.log('Connection Error', err);
+    return;
+  }
+  const db = client.db('tiny-app-7-jan-2019-fresh-to-death');
+  const usersColl = db.collection('users');
 // universal variables
 const urlDatabase = [];
 
-const users = {
-  userRandomID: {
-    id: 'userRandomID',
-    email: 'user@example.com',
-    password: user1PW,
-  },
-  user2RandomID: {
-    id: 'user2RandomID',
-    email: 'user2@example.com',
-    password: 'sow',
-  },
-};
+const users = {};
+
+app.use((req, res, next) => {
+  getUserObj(req.session.user_id, (err, user) => {
+    console.log('Initial User', err, user);
+    res.locals.user = req.user = (user || undefined);
+    next();
+  })
+})
 
 // GET routes (from most to least specific)
 app.get('/urls/new', (req, res) => {
   const templateVars = {
-    user: getUserObj(req.session.user_id),
   };
   if (req.session.user_id) {
     res.render('urls_new', templateVars);
@@ -64,7 +64,6 @@ app.get('/urls/:id', (req, res) => {
   const templateVars = {
     userID,
     longURL,
-    user: getUserObj(req.session.user_id),
     shortURL: req.params.id,
   };
 
@@ -84,7 +83,6 @@ app.get('/urls/:id', (req, res) => {
 app.get('/urls', (req, res) => {
   if (req.session.user_id) {
     const templateVars = {
-      user: getUserObj(req.session.user_id),  // obj
       urls: urlsForUser(req.session.user_id), // arr
     };
     res.render('urls_index', templateVars);
@@ -113,7 +111,7 @@ app.get('/', (req, res) => {
 
 app.get('/login', (req, res) => {
   if (!req.session.user_id) {
-    const templateVars = { user: getUserObj(req.session.user_id) };
+    const templateVars = { };
     res.render('urls_login', templateVars);
   } else {
     res.redirect('/urls');
@@ -121,8 +119,8 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  if (!req.session.user_id) {
-    const templateVars = { user: getUserObj(req.session.user_id) };
+  if (!req.user) {
+    const templateVars = {};
     res.render('urls_register', templateVars);
   } else {
     res.redirect('/urls');
@@ -154,37 +152,37 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const submittedEmail = req.body.email;
-  const emailMatchCheck = emailMatchChecker(submittedEmail); // boolean
-  if (emailMatchCheck){
-    const storedPassword = findPassword(submittedEmail);
-    const passwordMatchCheck = bcrypt.compareSync(req.body.password, storedPassword); // boolean
-    const userID = findUserID(submittedEmail);
-    if (passwordMatchCheck) {
-      req.session.user_id = users[userID].id;
-      return res.redirect('/urls');
+  authorize(req.body.email, req.body.password, (err, user) => {
+    if(user){
+      req.session.user_id = user.id;
+      res.redirect('/urls');
+    } else {
+      res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
     }
-  }
-  return res.send('Sorry, pal. Your email or password do not match. Try <a href="/login">logging in</a> again or <a href="/register">register an account</a>. 🚶');
+  })
 });
 
 app.post('/logout', (req, res) => { // leave as post
-  res.clearCookie('session');
-  res.clearCookie('session.sig');
+  req.session = null;
   res.redirect('/urls');
 });
 
 app.post('/register', (req, res) => {
-  if (emailMatchChecker(req.body.email)){
-    res.status(400).send('Email is already in the system. Try <a href="/login">logging in</a>.');
-  }
-  if (req.body.email && req.body.password) {
-    const newUser = insertUser(req.body.email, req.body.password);
-    req.session.user_id = newUser.id;
-    res.redirect('/urls');
-  } else {
+  if (!req.body.email || !req.body.password) {
     res.status(400).send('Yeah, we can\'t exactly register you with empty fields... <a href="/register">Try again</a>.');
+    return;
   }
+  emailMatchChecker(req.body.email, (err, emailsMatch) => {
+    if (err || emailsMatch){
+      res.status(400).send('Email is already in the system. Try <a href="/login">logging in</a>.');
+      return;
+    }
+    insertUser(req.body.email, req.body.password, (err, newUser) => {
+      req.session.user_id = newUser.id;
+      res.redirect('/urls');  
+    });
+     
+  });
 });
 
 app.listen(PORT, () => {
@@ -194,7 +192,7 @@ app.listen(PORT, () => {
 // HELPER functions
 function generateRandomString() {
   const everyAlphaNum = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-  const output = "";
+  let output = "";
   for (let i = 0; i < 6; i++) {
     const randomIndex = Math.floor(Math.random() * 62);
     output += everyAlphaNum[randomIndex];
@@ -202,17 +200,26 @@ function generateRandomString() {
   return output;
 }
 
-function insertUser(email, password){
+function insertUser(email, password, cb){
   const id = generateRandomString();
-  users[id] = {
+  usersColl.insertOne({
     id, email, 
     password: bcrypt.hashSync(password, 10)
-  };;
+  }, (err, result) => {
+    if(err){
+      cb(err);
+    } else {
+      cb(null, result.ops[0]);
+    }
+  });
   return users[id];
 }
-function getUserObj(theCookie) {
-  const userObj = users[theCookie];
-  return userObj;
+
+function getUserObj(id, cb) {
+  // const userObj = users[id];
+
+  // cb(null, userObj);
+  usersColl.findOne({id}, cb)
 }
 
 function findUserID(email) {
@@ -235,13 +242,10 @@ function urlsForUser(id) {
   return ownedURLs;
 }
 
-function emailMatchChecker(email) {
-  for (const user in users) {
-    if (users[user].email === email) {
-      return true;
-    }
-  }
-  return false;
+function emailMatchChecker(email, cb) {
+  usersColl.findOne({email}, (err, result) => {
+    cb(err, !!result);
+  })
 }
 
 function findPassword(email) {
@@ -317,6 +321,19 @@ function addToDatabase(newFull, shortUrl) {
   }
 }
 
+function authorize(email, password, cb){
+  usersColl.findOne({email}, (err, user) => {
+    if(err){
+      cb(err);
+    } else if(user && bcrypt.compareSync(password, user.password)){
+      cb(null, user);
+    } else {
+      cb(null);
+    }
+    
+  })
+}
+
 function matchLongUrl (urlsNestObj, shortUrl) {
   for (let item in urlsNestObj){
     if (urlsNestObj[item].tinyURL === shortUrl) {
@@ -324,3 +341,4 @@ function matchLongUrl (urlsNestObj, shortUrl) {
     }
   }
 }
+});
